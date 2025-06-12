@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import ForeignKey, Enum as SQLEnum, String
+from sqlalchemy import ForeignKey, Enum as SQLEnum, String, Table, Column, DateTime
 from backend.config.db import Base
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from backend.models.enums import UserRole
@@ -46,3 +46,15 @@ class TaskAssigneeAssociation(Base):
     def __str__(self):
         return f"TaskAssignee: task_id={self.task_id}, user_id={self.user_id}, role={self.role}"
 
+    """
+    Association table for the many-to-many relationship between meetings and participants.
+    Each row represents a user's participation in a meeting.
+    """
+
+
+meeting_participant_association = Table(
+    "meeting_participant_association",
+    Base.metadata,
+    Column("meeting_id", ForeignKey("meetings.id"), primary_key=True),
+    Column("user_id", ForeignKey("users.id"), primary_key=True),
+    Column("joined_at", DateTime, default=datetime.utcnow))

@@ -22,3 +22,9 @@ class TaskPriority(str, enum.Enum):
     HIGH = "HIGH"
     CRITICAL = "CRITICAL"
 
+
+class MeetingStatus(str, enum.Enum):
+    """Status meetings"""
+    SCHEDULED = "scheduled"
+    CANCELLED = "cancelled"
+

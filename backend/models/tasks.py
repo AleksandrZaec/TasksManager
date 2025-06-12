@@ -1,6 +1,6 @@
 from typing import List, Optional
-from sqlalchemy.orm import relationship, Mapped, mapped_column, String
-from sqlalchemy import Enum, ForeignKey, DateTime, Text
+from sqlalchemy.orm import relationship, Mapped, mapped_column
+from sqlalchemy import Enum, ForeignKey, DateTime, Text, String
 import datetime
 from backend.config.db import Base
 from backend.models.enums import TaskStatus, TaskPriority

@@ -60,3 +60,16 @@ class User(Base):
         back_populates="participants"
     )
 
+    cancelled_meetings: Mapped[List["Meeting"]] = relationship(
+        "Meeting",
+        foreign_keys="[Meeting.cancelled_by_id]",
+        back_populates="cancelled_by"
+    )
+
+    created_meetings: Mapped[List["Meeting"]] = relationship(
+        "Meeting",
+        foreign_keys="[Meeting.creator_id]",
+        back_populates="creator",
+        cascade="save-update, merge"
+    )
+
