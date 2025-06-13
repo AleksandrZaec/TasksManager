@@ -1,10 +1,12 @@
 import enum
 
 
+import enum
+
+
 class UserRole(str, enum.Enum):
     """ enum for user role"""
     USER = "user"
-    MANAGER = "manager"
     ADMIN = "admin"
 
 
@@ -28,3 +30,8 @@ class MeetingStatus(str, enum.Enum):
     SCHEDULED = "scheduled"
     CANCELLED = "cancelled"
 
+
+class TeamRole(str, enum.Enum):
+    """ enum for users role in tems"""
+    EXECUTOR = "EXECUTOR"
+    MANAGER = "MANAGER"

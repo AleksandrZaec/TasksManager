@@ -12,8 +12,11 @@ class UserBase(BaseModel):
     role: UserRole = UserRole.USER
 
 
-class UserCreate(UserBase):
+class UserCreate(BaseModel):
     """Schema for creating a new user."""
+    email: EmailStr
+    first_name: Optional[str] = Field(max_length=20)
+    last_name: Optional[str] = Field(max_length=20)
     password: str
 
     @field_validator('password')
@@ -52,3 +55,4 @@ class UserNameOnly(BaseModel):
 
     class Config:
         from_attributes = True
+

@@ -1,10 +1,10 @@
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from backend.auth.securiti import pwd_context
+from backend.auth.security import pwd_context
 from backend.crud.basecrud import BaseCRUD
 from backend.models.users import User
-from backend.schemas.users import UserCreate, UserRead, UserUpdate
+from backend.schemas.users_schemas import UserCreate, UserRead, UserUpdate
 
 
 class UserCRUD(BaseCRUD):
@@ -30,7 +30,7 @@ class UserCRUD(BaseCRUD):
         db.add(user)
         await db.commit()
         await db.refresh(user)
-        return self.read_schema.model_validate(user)
+        return UserRead.model_validate(user)
 
     async def update(self, db: AsyncSession, obj_id: int, obj_in: UserUpdate) -> UserRead:
         """Update user fields, check email uniqueness."""
@@ -58,5 +58,7 @@ class UserCRUD(BaseCRUD):
 
         await db.commit()
         await db.refresh(user)
-        return self.read_schema.model_validate(user)
+        return UserRead.model_validate(user)
 
+
+users_crud = UserCRUD()

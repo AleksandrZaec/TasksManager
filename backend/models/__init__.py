@@ -1,5 +1,5 @@
 from backend.config.db import Base
-from backend.models.enums import UserRole, MeetingStatus, TaskStatus, TaskPriority
+from backend.models.enums import UserRole, MeetingStatus, TaskStatus, TaskPriority, TeamRole
 from backend.models.associations import (
     TeamUserAssociation,
     TaskAssigneeAssociation,
@@ -15,6 +15,7 @@ from backend.models.meetings import Meeting
 
 __all__ = [
     'UserRole',
+    'TeamRole',
     'MeetingStatus',
     'TaskStatus',
     'TaskPriority',

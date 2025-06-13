@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 from sqlalchemy import ForeignKey, Enum as SQLEnum, String, Column, DateTime, Integer
 from backend.config.db import Base
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from backend.models.enums import UserRole
+from backend.models.enums import UserRole, TeamRole
 
 
 class TeamUserAssociation(Base):
@@ -14,7 +14,7 @@ class TeamUserAssociation(Base):
 
     team_id: Mapped[int] = mapped_column(ForeignKey("teams.id"), primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), primary_key=True, index=True)
-    role: Mapped[UserRole] = mapped_column(SQLEnum(UserRole), default=UserRole.USER)
+    role: Mapped[UserRole] = mapped_column(SQLEnum(TeamRole), default=TeamRole.EXECUTOR)
     joined_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
