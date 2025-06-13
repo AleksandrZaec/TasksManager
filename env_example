@@ -1,0 +1,15 @@
+#Database configuration
+DB_NAME=mydatabase           # Название базы данных
+DB_USER=myuser               # Пользователь базы данных
+DB_PASS=mysecurepassword     # Пароль к базе данных
+DB_HOST=localhost            # Хост базы (IP или домен)
+DB_PORT=5432                 # Порт базы (обычно 5432 для PostgreSQL)
+
+MODE=dev                     # Режим работы: dev, test, prod
+
+# JWT Authentication settings
+SECRET_KEY=your_jwt_secret_key                # Секретный ключ для подписи access token
+REFRESH_SECRET_KEY=your_jwt_refresh_secret    # Отдельный секретный ключ для refresh token (рекомендуется)
+ALGORITHM=HS256                               # Алгоритм шифрования токена (например, HS256)
+ACCESS_TOKEN_EXPIRE_MINUTES=60                # Время жизни access token в минутах
+REFRESH_TOKEN_EXPIRE_DAYS=7                   # Время жизни refresh token в днях

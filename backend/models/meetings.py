@@ -1,9 +1,9 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy import ForeignKey, Enum, DateTime, String, Text, CheckConstraint
 from sqlalchemy.orm import relationship, mapped_column, Mapped
 from backend.config.db import Base
-from backend.models.associations import meeting_participant_association
 from backend.models.enums import MeetingStatus
+from datetime import datetime, timezone
 
 
 class Meeting(Base):
@@ -17,13 +17,19 @@ class Meeting(Base):
     title: Mapped[str | None] = mapped_column(String(100), nullable=True)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     location: Mapped[str | None] = mapped_column(String(200), nullable=True)
-    start_datetime: Mapped[datetime] = mapped_column(DateTime, nullable=False)
-    end_datetime: Mapped[datetime] = mapped_column(DateTime, nullable=True)
+    start_datetime: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    end_datetime: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True)
     creator_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
     status: Mapped[MeetingStatus] = mapped_column(
-        Enum(MeetingStatus), default=MeetingStatus.SCHEDULED, nullable=False)
+        Enum(MeetingStatus),
+        default=MeetingStatus.SCHEDULED,
+        nullable=False
+    )
+
     created_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow, nullable=False
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        nullable=False
     )
     cancelled_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     cancelled_by_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
@@ -40,6 +46,6 @@ class Meeting(Base):
     )
     participants: Mapped[list["User"]] = relationship(
         "User",
-        secondary=meeting_participant_association,
+        secondary="meeting_participant_association",
         back_populates="meetings"
     )

@@ -1,8 +1,7 @@
 from fastapi import FastAPI
 
+from backend.api import users
+
 app = FastAPI(title="Team Manager")
 
-
-@app.get("/healthcheck")
-async def healthcheck():
-    return {"status": "ok", "db": "not checked"}
+app.include_router(users.router, prefix="/users", tags=["Users"])
