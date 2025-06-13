@@ -1,8 +1,8 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from typing import Optional
-from datetime import datetime
 from typing import List
 from backend.schemas.team_user import TeamUserAssociationRead
+from datetime import datetime, timezone
 
 
 class TeamBase(BaseModel):
@@ -15,8 +15,17 @@ class TeamBase(BaseModel):
 
 
 class TeamCreate(TeamBase):
-    """Fields required to create a new team."""
-    pass
+    invite_code_expires_at: datetime | None = Field(
+        None,
+        description="Автоматически: текущее время +7 дней"
+    )
+
+    @field_validator('invite_code_expires_at')
+    @classmethod
+    def validate_future_date(cls, v):
+        if v and v < datetime.now(timezone.utc):
+            raise ValueError("Дата должна быть в будущем")
+        return v
 
 
 class TeamUpdate(BaseModel):
@@ -35,5 +44,3 @@ class TeamRead(TeamBase):
 
     class Config:
         from_attributes = True
-
-

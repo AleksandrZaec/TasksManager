@@ -28,7 +28,7 @@ async def create_team(team: TeamCreate, db: AsyncSession = Depends(get_db)) -> T
 @router.get("/{team_id}", response_model=TeamRead)
 async def read_team(team_id: int, db: AsyncSession = Depends(get_db)) -> TeamRead:
     """Get a team by ID."""
-    team = await team_crud.get_by_id(db, team_id)
+    team = await team_crud.get_team(db, team_id)
     return team
 
 

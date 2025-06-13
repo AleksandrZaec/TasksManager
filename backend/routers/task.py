@@ -1,9 +1,11 @@
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List
+from backend.auth.auth import get_current_user
 from backend.schemas.task import TaskCreate, TaskRead, TaskUpdate
 from backend.crud.task import task_crud
 from backend.config.db import get_db
+from backend.schemas.user import UserPayload
 
 router = APIRouter(prefix="/tasks", tags=["Tasks"])
 
@@ -23,12 +25,16 @@ async def read_task(task_id: int, db: AsyncSession = Depends(get_db)) -> TaskRea
 
 
 @router.post("/", response_model=TaskRead, status_code=status.HTTP_201_CREATED)
-async def create_task(task_in: TaskCreate, db: AsyncSession = Depends(get_db)) -> TaskRead:
+async def create_task(
+        task_in: TaskCreate,
+        db: AsyncSession = Depends(get_db),
+        current_user: UserPayload = Depends(get_current_user)
+) -> TaskRead:
     """Create a new task."""
     create_task = await task_crud.create(
         db=db,
         obj_in=task_in,
-        # creator_id=current_user.user_id,
+        creator_id=current_user.user_id,
         team_id=task_in.team_id
     )
     return create_task

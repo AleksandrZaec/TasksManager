@@ -3,8 +3,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from backend.auth.security import pwd_context
 from backend.crud.basecrud import BaseCRUD
+from backend.models.association import TeamUserAssociation
+from backend.models.enum import UserRole
 from backend.models.user import User
 from backend.schemas.user import UserCreate, UserRead, UserUpdate
+from sqlalchemy.orm import selectinload
 
 
 class UserCRUD(BaseCRUD):
@@ -58,6 +61,51 @@ class UserCRUD(BaseCRUD):
 
         await db.commit()
         await db.refresh(user)
+        return UserRead.model_validate(user)
+
+    @staticmethod
+    async def get_for_login(db: AsyncSession, email: str):
+        user = await db.scalar(
+            select(User)
+            .options(
+                selectinload(User.user_teams).load_only(
+                    TeamUserAssociation.team_id,
+                    TeamUserAssociation.role
+                )
+            )
+            .where(User.email == email)
+        )
+
+        if not user:
+            return None
+
+        user_data = {
+            "password": user.password,
+            "id": user.id,
+            "role": user.role.value,
+            "teams": [
+                {
+                    "team_id": association.team_id,
+                    "role": association.role.value
+                }
+                for association in user.user_teams
+            ]
+        }
+
+        return user_data
+
+    async def set_global_role(self, db: AsyncSession, user_id: int, role: UserRole) -> UserRead:
+        """Assign a global role to a user (for admins only)."""
+        result = await db.execute(select(User).where(User.id == user_id))
+        user = result.scalar_one_or_none()
+
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        user.role = role
+        await db.commit()
+        await db.refresh(user)
+
         return UserRead.model_validate(user)
 
 

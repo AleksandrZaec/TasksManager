@@ -1,6 +1,7 @@
 from pydantic import BaseModel, EmailStr, Field, field_validator
-from typing import Optional
+from typing import Optional, List
 import re
+from backend.models.enum import TeamRole
 from backend.models.user import UserRole
 
 
@@ -56,3 +57,15 @@ class UserNameOnly(BaseModel):
     class Config:
         from_attributes = True
 
+
+class UserTeamInfo(BaseModel):
+    """The payload model for the JWT token."""
+    team_id: int
+    role: TeamRole
+
+
+class UserPayload(BaseModel):
+    """The payload model for the JWT token."""
+    id: int
+    role: str
+    teams: List[UserTeamInfo] = []
