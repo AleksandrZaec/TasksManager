@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 from sqlalchemy import ForeignKey, Enum as SQLEnum, String, Column, DateTime, Integer
 from backend.config.db import Base
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from backend.models.enums import UserRole, TeamRole
+from backend.models.enum import UserRole, TeamRole
 
 
 class TeamUserAssociation(Base):

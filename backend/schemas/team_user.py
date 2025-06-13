@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
-from backend.models.enums import TeamRole
+from backend.models.enum import TeamRole
 
 
 class TeamUserAssociationBase(BaseModel):

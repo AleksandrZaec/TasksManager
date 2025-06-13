@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends, status
 from typing import List
 from sqlalchemy.ext.asyncio import AsyncSession
 from backend.config.db import get_db
-from backend.crud.users_crud import users_crud
-from backend.schemas.users_schemas import UserCreate, UserRead, UserUpdate
+from backend.crud.user import users_crud
+from backend.schemas.user import UserCreate, UserRead, UserUpdate
 
 router = APIRouter()
 

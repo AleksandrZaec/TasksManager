@@ -1,9 +1,6 @@
 import enum
 
 
-import enum
-
-
 class UserRole(str, enum.Enum):
     """ enum for user role"""
     USER = "user"

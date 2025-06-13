@@ -3,7 +3,7 @@ from sqlalchemy.orm import relationship, Mapped, mapped_column
 from sqlalchemy import Enum, ForeignKey, DateTime, Text, String
 from datetime import datetime, timezone
 from backend.config.db import Base
-from backend.models.enums import TaskStatus, TaskPriority
+from backend.models.enum import TaskStatus, TaskPriority
 
 
 class Task(Base):

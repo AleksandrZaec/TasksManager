@@ -1,10 +1,11 @@
 from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from backend.config.db import get_db
-from backend.schemas.TeamUserAssociation_schemas import TeamUserAssociationRead, TeamUserAssociationCreate, \
+from backend.crud.team_user import team_user_association_crud
+from backend.schemas.team_user import TeamUserAssociationRead, TeamUserAssociationCreate, \
     TeamUserAssociationUpdate
-from backend.schemas.teams_schemas import TeamCreate, TeamRead, TeamUpdate
-from backend.crud.teams_crud import team_crud, team_user_association_crud
+from backend.schemas.team import TeamCreate, TeamRead, TeamUpdate
+from backend.crud.team import team_crud
 from typing import List
 
 router = APIRouter()
@@ -73,11 +74,12 @@ async def remove_user_from_team(
 
 
 @router.put("/{team_id}/{user_id}", response_model=TeamUserAssociationRead)
-async def update_user_role(team_id: int,
-                           user_id: int,
-                           association_in: TeamUserAssociationUpdate,
-                           db: AsyncSession = Depends(get_db)
-                           ) -> TeamUserAssociationRead:
+async def update_user_role(
+        team_id: int,
+        user_id: int,
+        association_in: TeamUserAssociationUpdate,
+        db: AsyncSession = Depends(get_db)
+) -> TeamUserAssociationRead:
     """Update a user's role in a team."""
     if association_in.role is None:
         raise HTTPException(status_code=400, detail="Role is required")

@@ -2,7 +2,7 @@ from sqlalchemy.orm import relationship, Mapped, mapped_column
 from sqlalchemy import Enum, String
 from typing import List
 from backend.config.db import Base
-from backend.models.enums import UserRole
+from backend.models.enum import UserRole
 
 
 class User(Base):

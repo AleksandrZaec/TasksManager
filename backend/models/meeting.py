@@ -1,8 +1,7 @@
-from datetime import datetime, timezone
 from sqlalchemy import ForeignKey, Enum, DateTime, String, Text, CheckConstraint
 from sqlalchemy.orm import relationship, mapped_column, Mapped
 from backend.config.db import Base
-from backend.models.enums import MeetingStatus
+from backend.models.enum import MeetingStatus
 from datetime import datetime, timezone
 
 

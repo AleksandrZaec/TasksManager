@@ -3,8 +3,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from backend.auth.security import pwd_context
 from backend.crud.basecrud import BaseCRUD
-from backend.models.users import User
-from backend.schemas.users_schemas import UserCreate, UserRead, UserUpdate
+from backend.models.user import User
+from backend.schemas.user import UserCreate, UserRead, UserUpdate
 
 
 class UserCRUD(BaseCRUD):

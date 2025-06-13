@@ -1,23 +1,11 @@
-from backend.models import TeamUserAssociation, TeamRole
-from backend.models.teams import Team
-from backend.schemas.TeamUserAssociation_schemas import TeamUserAssociationRead
-from backend.schemas.teams_schemas import TeamRead
 from backend.crud.basecrud import BaseCRUD
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from typing import Dict
-
-
-class TeamCRUD(BaseCRUD):
-    """CRUD operations for Team model."""
-
-    def __init__(self):
-        super().__init__(Team, TeamRead)
-
-
-team_crud = TeamCRUD()
+from backend.models.association import TeamUserAssociation, TeamRole
+from backend.schemas.team_user import TeamUserAssociationRead
 
 
 class TeamUserAssociationCRUD(BaseCRUD):

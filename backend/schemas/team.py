@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field
 from typing import Optional
 from datetime import datetime
 from typing import List
-from backend.schemas.TeamUserAssociation_schemas import TeamUserAssociationRead
+from backend.schemas.team_user import TeamUserAssociationRead
 
 
 class TeamBase(BaseModel):

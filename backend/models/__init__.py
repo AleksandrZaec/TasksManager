@@ -1,16 +1,16 @@
 from backend.config.db import Base
-from backend.models.enums import UserRole, MeetingStatus, TaskStatus, TaskPriority, TeamRole
-from backend.models.associations import (
+from backend.models.enum import UserRole, MeetingStatus, TaskStatus, TaskPriority, TeamRole
+from backend.models.association import (
     TeamUserAssociation,
     TaskAssigneeAssociation,
     MeetingParticipantAssociation,
 )
-from backend.models.users import User
-from backend.models.teams import Team
-from backend.models.tasks import Task
-from backend.models.comments import Comment
-from backend.models.evaluations import Evaluation
-from backend.models.meetings import Meeting
+from backend.models.user import User
+from backend.models.team import Team
+from backend.models.task import Task
+from backend.models.comment import Comment
+from backend.models.evaluation import Evaluation
+from backend.models.meeting import Meeting
 
 
 __all__ = [
