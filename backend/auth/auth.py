@@ -1,4 +1,5 @@
 from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jose import jwt, JWTError
 from backend.config.settings import settings
 from fastapi import Depends, HTTPException, status
@@ -6,10 +7,11 @@ from fastapi import Depends, HTTPException, status
 from backend.models import TeamRole
 from backend.schemas.user import UserPayload, UserTeamInfo
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
+# oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
+bearer_scheme = HTTPBearer()
 
 
-async def get_current_user(token: str = Depends(oauth2_scheme)) -> UserPayload:
+async def get_current_user(token: HTTPAuthorizationCredentials = Depends(bearer_scheme)) -> UserPayload:
     """Decode JWT token and return current user's ID, role and team roles."""
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -17,7 +19,8 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> UserPayload:
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+        token_str = token.credentials
+        payload = jwt.decode(token_str, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
 
         if payload.get("token_type") == "refresh":
             raise credentials_exception
@@ -75,4 +78,3 @@ async def decode_refresh_token(refresh_token: str) -> dict:
 
     except (JWTError, ValueError, TypeError) as e:
         raise credentials_exception
-

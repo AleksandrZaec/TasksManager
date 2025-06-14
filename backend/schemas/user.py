@@ -42,15 +42,29 @@ class UserUpdate(BaseModel):
 
 
 class UserRead(UserBase):
-    """Schema for reading user data from the database."""
+    """Schema for reading basic user data from the database."""
     id: int
 
     class Config:
         from_attributes = True
 
 
+class UserTeamRead(BaseModel):
+    """Schema for user-team association (used in detailed user read)."""
+    team_id: int
+    role: TeamRole
+
+    class Config:
+        from_attributes = True
+
+
+class UserReadWithTeams(UserRead):
+    """Schema for reading user data with all team roles."""
+    teams: List[UserTeamRead] = []
+
+
 class UserNameOnly(BaseModel):
-    """Schema for the presentation in the tasks"""
+    """Schema for the presentation in the tasks."""
     first_name: Optional[str] = None
     last_name: Optional[str] = None
 

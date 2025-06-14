@@ -1,9 +1,11 @@
+from http.client import HTTPException
+
 from fastapi import APIRouter, Depends, status
 from typing import List
 from sqlalchemy.ext.asyncio import AsyncSession
 from backend.config.db import get_db
 from backend.crud.user import users_crud
-from backend.schemas.user import UserCreate, UserRead, UserUpdate
+from backend.schemas.user import UserCreate, UserRead, UserUpdate, UserReadWithTeams, UserTeamRead
 
 router = APIRouter()
 
@@ -15,10 +17,10 @@ async def read_users(db: AsyncSession = Depends(get_db)) -> List[UserRead]:
     return users
 
 
-@router.get("/{user_id}", response_model=UserRead)
+@router.get("/{user_id}", response_model=UserReadWithTeams)
 async def read_user(user_id: int, db: AsyncSession = Depends(get_db)) -> UserRead:
     """Get a user by ID."""
-    user = await users_crud.get_by_id(db, user_id)
+    user = await users_crud.get_with_teams(db, user_id)
     return user
 
 

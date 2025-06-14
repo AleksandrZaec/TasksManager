@@ -6,7 +6,7 @@ from backend.crud.basecrud import BaseCRUD
 from backend.models.association import TeamUserAssociation
 from backend.models.enum import UserRole
 from backend.models.user import User
-from backend.schemas.user import UserCreate, UserRead, UserUpdate
+from backend.schemas.user import UserCreate, UserRead, UserUpdate, UserReadWithTeams, UserTeamRead
 from sqlalchemy.orm import selectinload
 
 
@@ -93,6 +93,39 @@ class UserCRUD(BaseCRUD):
         }
 
         return user_data
+
+    async def get_with_teams(self, db: AsyncSession, user_id: int) -> UserReadWithTeams:
+        """Retrieve a user by ID along with their team memberships and roles, including team names."""
+        result = await db.execute(
+            select(User)
+            .where(User.id == user_id)
+            .options(
+                selectinload(User.user_teams).selectinload(TeamUserAssociation.team)
+            )
+        )
+        user = result.scalar_one_or_none()
+
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found"
+            )
+
+        return UserReadWithTeams(
+            id=user.id,
+            email=user.email,
+            first_name=user.first_name,
+            last_name=user.last_name,
+            role=user.role,
+            teams=[
+                UserTeamRead(
+                    team_id=assoc.team_id,
+                    role=assoc.role,
+                    team_name=assoc.team.name
+                )
+                for assoc in user.user_teams
+            ]
+        )
 
     async def set_global_role(self, db: AsyncSession, user_id: int, role: UserRole) -> UserRead:
         """Assign a global role to a user (for admins only)."""

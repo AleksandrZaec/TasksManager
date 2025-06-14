@@ -11,15 +11,16 @@ class TeamUserAssociationBase(BaseModel):
     role: TeamRole
 
 
-class TeamUserAssociationCreate(BaseModel):
+class TeamUserAssociationCreate(TeamUserAssociationBase):
     """Schema for adding a user to a team."""
-    user_id: int
-    role: TeamRole
+    pass
 
 
-class TeamUserAssociationUpdate(BaseModel):
+class TeamUserAssociationUpdate(TeamUserAssociationBase):
     """Schema for updating team-user association role."""
     role: Optional[TeamRole] = None
+    team_id: Optional[int] = None
+    user_id: Optional[int] = None
 
 
 class TeamUserAssociationRead(TeamUserAssociationBase):
@@ -29,3 +30,6 @@ class TeamUserAssociationRead(TeamUserAssociationBase):
 
     class Config:
         from_attributes = True
+
+
+
