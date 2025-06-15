@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List
 from backend.src.services.auth import get_current_user
 from backend.src.services.task import tasks_crud
-from backend.src.schemas.task import TaskCreate, TaskUpdate, TaskRead, TaskShortRead, TaskStatusUpdate
+from backend.src.schemas.task import TaskCreate, TaskUpdate, TaskRead, TaskShortRead, TaskStatusUpdate, TaskFilter
 from backend.src.config.db import get_db
 from backend.src.models.user import User
 
@@ -49,8 +49,7 @@ async def update_task(
         db: AsyncSession = Depends(get_db),
 ) -> TaskShortRead:
     """Update an existing task."""
-    task = await tasks_crud.update(db=db, obj_id=task_id, obj_in=task_in)
-    return task
+    return await tasks_crud.update(db=db, obj_id=task_id, obj_in=task_in)
 
 
 @router.delete("/{task_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -76,4 +75,19 @@ async def update_task_status(
         task_id=task_id,
         new_status=status_update.status,
         changed_by_id=current_user.id
+    )
+
+
+@router.post("/my", response_model=List[TaskShortRead])
+async def get_my_tasks(
+        filters: TaskFilter,
+        db: AsyncSession = Depends(get_db),
+        current_user: User = Depends(get_current_user)
+) -> List[TaskShortRead]:
+    """Get tasks where the current user is the author or performer."""
+    return await tasks_crud.get_user_related_tasks(
+        db=db,
+        user_id=current_user.id,
+        statuses=filters.statuses,
+        priorities=filters.priorities
     )

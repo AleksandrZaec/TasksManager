@@ -1,8 +1,8 @@
-from typing import List
+from typing import List, Optional
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
-from backend.src.models import Task, TaskStatus
+from sqlalchemy import select, or_
+from backend.src.models import Task, TaskStatus, TaskPriority, User
 from backend.src.models.task_status_history import TaskStatusHistory
 from backend.src.schemas.task import TaskRead, TaskShortRead, TaskCreate
 from backend.src.services.basecrud import BaseCRUD
@@ -87,6 +87,38 @@ class TaskCRUD(BaseCRUD):
         await db.refresh(task)
 
         return TaskShortRead.model_validate(task)
+
+    async def get_user_related_tasks(
+            self,
+            db: AsyncSession,
+            user_id: int,
+            statuses: Optional[List[TaskStatus]] = None,
+            priorities: Optional[List[TaskPriority]] = None
+    ) -> List[TaskShortRead]:
+        """Retrieves the tasks that the user is associated with, using the filters"""
+        stmt = (
+            select(Task)
+            .options(selectinload(Task.assignees))
+            .distinct()
+            .where(
+                or_(
+                    Task.creator_id == user_id,
+                    Task.assignees.any(User.id == user_id)
+                )
+            )
+        )
+
+        if statuses:
+            stmt = stmt.where(Task.status.in_(statuses))
+        else:
+            stmt = stmt.where(Task.status.in_([TaskStatus.OPEN, TaskStatus.IN_PROGRESS]))
+
+        if priorities:
+            stmt = stmt.where(Task.priority.in_(priorities))
+
+        result = await db.execute(stmt)
+        tasks = result.scalars().all()
+        return [TaskShortRead.model_validate(task) for task in tasks]
 
 
 tasks_crud = TaskCRUD()
