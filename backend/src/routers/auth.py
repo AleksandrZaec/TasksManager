@@ -38,12 +38,11 @@ async def login(
 
     )
 
-    response_data = {
+    return {
         "access_token": access_token,
         "refresh_token": refresh_token,
         "token_type": "bearer"
     }
-    return response_data
 
 
 @router.post("/refresh")
@@ -61,8 +60,7 @@ async def refresh_token(
             }
         )
 
-        response_data = {"access_token": new_access_token, "token_type": "bearer"}
-        return response_data
+        return {"access_token": new_access_token, "token_type": "bearer"}
 
     except HTTPException:
         raise

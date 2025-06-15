@@ -1,10 +1,14 @@
 import uuid
 from datetime import datetime, timedelta, timezone
+
+from backend.src.models import TeamUserAssociation
 from backend.src.models.team import Team
+from backend.src.schemas.task import TaskRead
 from backend.src.schemas.team import TeamCreate, TeamRead, TeamWithUsersAndTask
+from backend.src.schemas.team_user import TeamUserAssociationRead
 from backend.src.services.basecrud import BaseCRUD
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.future import select
+from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from fastapi import HTTPException, status
 from sqlalchemy.orm import selectinload
@@ -24,9 +28,7 @@ class TeamCRUD(BaseCRUD):
 
     async def create(self, db: AsyncSession, team: TeamCreate) -> TeamRead:
         """Create a new Team ensuring unique name, with fallback on DB constraint."""
-        result = await db.execute(
-            select(Team).where(Team.name == team.name.strip())
-        )
+        result = await db.execute(select(Team).where(Team.name == team.name.strip()))
         existing_team = result.scalar_one_or_none()
         if existing_team:
             raise HTTPException(
@@ -55,40 +57,50 @@ class TeamCRUD(BaseCRUD):
                 if "teams_name_key" in err_msg or ("unique constraint" in err_msg and "name" in err_msg):
                     raise HTTPException(
                         status_code=status.HTTP_400_BAD_REQUEST,
-                        detail="Team with this name already exists"
-                    )
+                        detail="Team with this name already exists")
+
                 elif "teams_invite_code_key" in err_msg or (
                         "unique constraint" in err_msg and "invite_code" in err_msg):
                     if attempt == max_attempts - 1:
                         raise HTTPException(
                             status_code=status.HTTP_400_BAD_REQUEST,
-                            detail="Failed to generate unique invite code, please try again"
-                        )
+                            detail="Failed to generate unique invite code, please try again")
                 else:
                     raise
 
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Failed to create team after multiple attempts"
-        )
+            detail="Failed to create team after multiple attempts")
 
     async def get_by_id_with_relations(self, db: AsyncSession, team_id: int) -> TeamWithUsersAndTask:
-        """Get team by id with related users and tasks loaded via selectinload."""
-        stmt = (
-            select(Team)
-            .options(
-                selectinload(Team.team_users),
-                selectinload(Team.tasks)
-            )
-            .where(Team.id == team_id)
-        )
+        """Return team with flat user data and tasks"""
+        stmt = (select(Team).options(selectinload(Team.team_users).selectinload(TeamUserAssociation.user),
+                                     selectinload(Team.tasks)).where(Team.id == team_id))
         result = await db.execute(stmt)
-        team = result.scalar_one_or_none()
+        team: Team | None = result.scalar_one_or_none()
         if not team:
             raise HTTPException(status_code=404, detail="Team not found")
 
-        return TeamWithUsersAndTask.model_validate(team)
+        flat_team_users = [
+            TeamUserAssociationRead(
+                user_id=assoc.user.id,
+                email=assoc.user.email,
+                first_name=assoc.user.first_name,
+                last_name=assoc.user.last_name,
+                role=assoc.role,
+                joined_at=assoc.joined_at,
+                updated_at=assoc.updated_at
+            )
+            for assoc in team.team_users
+        ]
+
+        return TeamWithUsersAndTask(
+            id=team.id,
+            name=team.name,
+            description=team.description,
+            team_users=flat_team_users,
+            tasks=[TaskRead.model_validate(task) for task in team.tasks]
+        )
 
 
 team_crud = TeamCRUD()
-

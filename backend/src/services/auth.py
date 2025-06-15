@@ -39,8 +39,7 @@ async def get_current_user(token: HTTPAuthorizationCredentials = Depends(bearer_
             for team in teams_data
         ]
 
-        user_payload = UserPayload(id=user_id, role=role, teams=teams)
-        return user_payload
+        return UserPayload(id=user_id, role=role, teams=teams)
 
     except (JWTError, ValueError, TypeError, KeyError) as e:
         raise credentials_exception
@@ -68,14 +67,12 @@ async def decode_refresh_token(refresh_token: str) -> dict:
         token_jti = payload["jti"]
         teams = payload["teams"]
 
-        token_data = {
+        return {
             "user_id": user_id,
             "role": user_role,
             "jti": token_jti,
             "teams": teams
         }
-        return token_data
 
     except (JWTError, ValueError, TypeError) as e:
         raise credentials_exception
-

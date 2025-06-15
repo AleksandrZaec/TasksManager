@@ -17,15 +17,13 @@ class BaseCRUD:
         obj = result.scalar_one_or_none()
         if not obj:
             raise HTTPException(status_code=404, detail="Object not found")
-        res = self.read_schema.model_validate(obj)
-        return res
+        return self.read_schema.model_validate(obj)
 
     async def get_all(self, db: AsyncSession) -> List[BaseModel]:
         """Get all objects."""
         result = await db.execute(select(self.model))
         objs = result.scalars().all()
-        res = [self.read_schema.model_validate(obj) for obj in objs]
-        return res
+        return [self.read_schema.model_validate(obj) for obj in objs]
 
     async def create(self, db: AsyncSession, obj_in: BaseModel) -> BaseModel:
         """Create a new object."""
@@ -33,8 +31,7 @@ class BaseCRUD:
         db.add(obj)
         await db.commit()
         await db.refresh(obj)
-        res = self.read_schema.model_validate(obj)
-        return res
+        return self.read_schema.model_validate(obj)
 
     async def update(self, db: AsyncSession, obj_id: int, obj_in: BaseModel) -> BaseModel:
         """Update existing object by its ID."""
@@ -49,8 +46,7 @@ class BaseCRUD:
 
         await db.commit()
         await db.refresh(obj)
-        res = self.read_schema.model_validate(obj)
-        return res
+        return self.read_schema.model_validate(obj)
 
     async def delete(self, db: AsyncSession, obj_id: int) -> dict:
         """Delete object by its ID."""

@@ -65,16 +65,8 @@ class UserCRUD(BaseCRUD):
 
     @staticmethod
     async def get_for_login(db: AsyncSession, email: str):
-        user = await db.scalar(
-            select(User)
-            .options(
-                selectinload(User.user_teams).load_only(
-                    TeamUserAssociation.team_id,
-                    TeamUserAssociation.role
-                )
-            )
-            .where(User.email == email)
-        )
+        user = await db.scalar(select(User).options(selectinload(User.user_teams).load_only(
+            TeamUserAssociation.team_id, TeamUserAssociation.role)).where(User.email == email))
 
         if not user:
             return None
@@ -96,13 +88,9 @@ class UserCRUD(BaseCRUD):
 
     async def get_with_teams(self, db: AsyncSession, user_id: int) -> UserReadWithTeams:
         """Retrieve a user by ID along with their team memberships and roles, including team names."""
-        result = await db.execute(
-            select(User)
-            .where(User.id == user_id)
-            .options(
-                selectinload(User.user_teams).selectinload(TeamUserAssociation.team)
-            )
-        )
+        result = await db.execute(select(User).where(User.id == user_id).options(
+            selectinload(User.user_teams).selectinload(TeamUserAssociation.team)))
+
         user = result.scalar_one_or_none()
 
         if not user:
@@ -143,5 +131,3 @@ class UserCRUD(BaseCRUD):
 
 
 users_crud = UserCRUD()
-
-

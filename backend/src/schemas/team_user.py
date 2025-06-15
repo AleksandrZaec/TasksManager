@@ -1,6 +1,6 @@
-from pydantic import BaseModel
-from typing import Optional
 from datetime import datetime
+from typing import Optional
+from pydantic import BaseModel, EmailStr
 from backend.src.models.enum import TeamRole
 
 
@@ -12,19 +12,24 @@ class TeamUserAssociationBase(BaseModel):
 
 
 class TeamUserAssociationCreate(TeamUserAssociationBase):
-    """Schema for adding a user to a team."""
+    """Schema for creating a team-user association."""
     pass
 
 
-class TeamUserAssociationUpdate(TeamUserAssociationBase):
-    """Schema for updating team-user association role."""
+class TeamUserAssociationUpdate(BaseModel):
+    """Schema for updating team-user association fields."""
     role: Optional[TeamRole] = None
     team_id: Optional[int] = None
     user_id: Optional[int] = None
 
 
-class TeamUserAssociationRead(TeamUserAssociationBase):
-    """Schema for reading team-user association with timestamps."""
+class TeamUserAssociationRead(BaseModel):
+    """Detailed team user info (flat structure)"""
+    user_id: int
+    email: EmailStr
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    role: TeamRole
     joined_at: datetime
     updated_at: datetime
 
@@ -32,4 +37,12 @@ class TeamUserAssociationRead(TeamUserAssociationBase):
         from_attributes = True
 
 
+class TeamUserAdd(BaseModel):
+    """Payload for adding a user to a team by email and role."""
+    email: EmailStr
+    role: TeamRole = TeamRole.EXECUTOR
 
+
+class TeamUserUpdateRole(BaseModel):
+    """Payload for updating a user's role in a team."""
+    role: TeamRole
