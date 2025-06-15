@@ -59,3 +59,8 @@ class TaskStatusUpdate(BaseModel):
     """Schema for update status."""
     status: TaskStatus
 
+
+class TaskFilter(BaseModel):
+    """Schema for filters for user-related tasks."""
+    statuses: Optional[List[TaskStatus]] = None
+    priorities: Optional[List[TaskPriority]] = None
