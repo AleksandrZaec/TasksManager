@@ -53,3 +53,10 @@ class Task(Base):
         back_populates="task",
         cascade="all, delete-orphan"
     )
+
+    status_history: Mapped[List["TaskStatusHistory"]] = relationship(
+        "TaskStatusHistory",
+        back_populates="task",
+        cascade="all, delete-orphan"
+    )
+

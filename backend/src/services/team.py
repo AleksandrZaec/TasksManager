@@ -103,4 +103,4 @@ class TeamCRUD(BaseCRUD):
         )
 
 
-team_crud = TeamCRUD()
+teams_crud = TeamCRUD()
