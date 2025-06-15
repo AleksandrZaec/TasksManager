@@ -1,8 +1,8 @@
 import { Routes, Route } from 'react-router-dom';
 import { ROUTES } from './Routes';
 import { LoginPage } from '../pages/loginPage/LoginPage';
-import { RegisterPage } from '../pages/RedisterPage/RegisterPage';
-import { MainPage } from '../pages/MainPage';
+import { RegisterPage } from '../pages/registerPage/RegisterPage';
+import { MainPage } from '../pages/mainPage/MainPage';
 import { ProfilePage } from '../pages/ProfilePage';
 import { NotFoundPage } from '../pages/NotFoundPage';
 
