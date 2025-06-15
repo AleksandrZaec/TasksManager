@@ -35,14 +35,14 @@ class UserCRUD(BaseCRUD):
         await db.refresh(user)
         return UserRead.model_validate(user)
 
-    async def update(self, db: AsyncSession, obj_id: int, obj_in: UserUpdate) -> UserRead:
+    async def update(self, db: AsyncSession, user_id: int, user_in: UserUpdate) -> UserRead:
         """Update user fields, check email uniqueness."""
-        result = await db.execute(select(User).where(User.id == obj_id))
+        result = await db.execute(select(User).where(User.id == user_id))
         user = result.scalar_one_or_none()
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
 
-        update_data = obj_in.dict(exclude_unset=True)
+        update_data = user_in.dict(exclude_unset=True)
 
         if "email" in update_data and update_data["email"] != user.email:
             result = await db.execute(select(User).where(User.email == update_data["email"]))

@@ -5,6 +5,7 @@ from backend.src.models.association import (
     TaskAssigneeAssociation,
     MeetingParticipantAssociation,
 )
+from backend.src.models.task_status_history import TaskStatusHistory
 from backend.src.models.user import User
 from backend.src.models.team import Team
 from backend.src.models.task import Task
@@ -28,5 +29,6 @@ __all__ = [
     'TeamUserAssociation',
     'TaskAssigneeAssociation',
     'MeetingParticipantAssociation',
+    'TaskStatusHistory',
 ]
 
