@@ -1,4 +1,5 @@
 import { Block } from '../../items/block/Block';
+import { Button } from '../../items/button/Button';
 import s from './Header.module.scss';
 
 type HeaderProps = {
@@ -9,7 +10,8 @@ export const Header = ({ children }: HeaderProps) => {
     <div className={s.container}>
       <div className={s.menu}>
         <Block extraClass={s.header}>
-          <p>Проекты(комнаты)</p>
+          <Button>Добавить команду</Button>
+          <p>Список команд</p>
           <p>Календарь</p>
           <p>Встречи</p>
           <p>Профиль</p>
