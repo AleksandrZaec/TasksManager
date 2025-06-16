@@ -1,0 +1,15 @@
+@use '../../styles/styles.scss' as *;
+
+.content {
+  height: 700px;
+}
+.main {
+  display: flex;
+  align-items: center;
+  gap: 50px;
+}
+.table {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}

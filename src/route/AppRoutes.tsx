@@ -10,13 +10,13 @@ import { BackgroundImageLayout } from '../components/layouts/BackgroundImageLayo
 export const AppRoutes = () => {
   return (
     <Routes>
-      <Route path={ROUTES.LOGIN} element={<LoginPage />} />
-      <Route path={ROUTES.REGISTER} element={<RegisterPage />} />
       <Route element={<BackgroundImageLayout />}>
-        <Route path={ROUTES.HOME} element={<MainPage />} />
+        <Route path={ROUTES.LOGIN} element={<LoginPage />} />
+        <Route path={ROUTES.REGISTER} element={<RegisterPage />} />
         <Route path={ROUTES.PROFILE} element={<ProfilePage />} />
         <Route path={ROUTES.NOT_FOUND} element={<NotFoundPage />} />
       </Route>
+      <Route path={ROUTES.HOME} element={<MainPage />} />
     </Routes>
   );
 };

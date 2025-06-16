@@ -10,6 +10,7 @@
 
 .backround {
   position: absolute;
+  z-index: 0;
 }
 .blob1 {
   top: 40%;
@@ -17,11 +18,15 @@
   left: -10%;
 }
 .blob2 {
-  left: 65%;
+  left: 70%;
   width: 25%;
 }
 .blob3 {
   top: 40%;
   left: 80%;
   width: 40%;
+}
+.content {
+  position: relative;
+  z-index: 1;
 }
