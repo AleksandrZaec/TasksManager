@@ -79,9 +79,9 @@ async def update_task_status(
     )
 
 
-@router.get("/my", response_model=List[TaskShortRead])
+@router.post("/my", response_model=List[TaskShortRead])
 async def get_my_tasks(
-        filters: TaskFilter = Depends(),
+        filters: TaskFilter,
         db: AsyncSession = Depends(get_db),
         current_user: User = Depends(get_current_user)
 ) -> List[TaskShortRead]:
