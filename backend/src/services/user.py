@@ -11,8 +11,8 @@ from sqlalchemy.orm import selectinload
 
 
 class UserCRUD(BaseCRUD):
+    """CRUD operations for User model."""
     def __init__(self):
-        """Init with User model and UserRead schema."""
         super().__init__(User, UserRead)
 
     async def create(self, db: AsyncSession, obj_in: UserCreate) -> UserRead:

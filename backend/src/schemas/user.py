@@ -40,15 +40,6 @@ class UserReadWithTeams(UserRead):
         from_attributes = True
 
 
-class UserNameOnly(BaseModel):
-    """Schema for the presentation in the tasks."""
-    first_name: Optional[str] = None
-    last_name: Optional[str] = None
-
-    class Config:
-        from_attributes = True
-
-
 class UserCreate(BaseModel):
     """Schema for creating a new user."""
     email: EmailStr
@@ -81,4 +72,3 @@ class UserPayload(BaseModel):
     id: int
     role: str
     teams: List[UserTeamInfo] = []
-

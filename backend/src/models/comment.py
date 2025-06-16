@@ -16,3 +16,7 @@ class Comment(Base):
 
     task: Mapped["Task"] = relationship("Task", back_populates="comments")
     author: Mapped["User"] = relationship("User", back_populates="comments")
+
+    @property
+    def author_full_name(self) -> str:
+        return f"{self.author.first_name} {self.author.last_name}"
