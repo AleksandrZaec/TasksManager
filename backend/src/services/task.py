@@ -13,7 +13,7 @@ class TaskCRUD(BaseCRUD):
     def __init__(self):
         super().__init__(model=Task, read_schema=TaskRead)
 
-    async def create(self, db: AsyncSession, task_in: TaskCreate, creator_id: int, team_id: int) -> TaskShortRead:
+    async def create_task(self, db: AsyncSession, task_in: TaskCreate, creator_id: int, team_id: int) -> TaskShortRead:
         """Create a new task with the given input, creator, and team."""
         data = task_in.model_dump()
         data["creator_id"] = creator_id

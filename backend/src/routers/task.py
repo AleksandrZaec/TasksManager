@@ -17,7 +17,7 @@ async def create_task(
         current_user: User = Depends(get_current_user),
 ) -> TaskShortRead:
     """Create a new task."""
-    return await tasks_crud.create(
+    return await tasks_crud.create_task(
         db=db,
         task_in=task_in,
         creator_id=current_user.id,
