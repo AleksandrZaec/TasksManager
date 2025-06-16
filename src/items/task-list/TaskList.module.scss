@@ -1,0 +1,46 @@
+@use '../../styles/styles.scss' as *;
+
+.tasks {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.list {
+  margin-bottom: 14px;
+}
+.statusIcons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  border-radius: 6px;
+  max-width: 150px;
+  margin-bottom: 10px;
+  font-size: 18px;
+  &.pending {
+    background-color: #cecece;
+  }
+
+  &.inProgress {
+    background-color: #ffe867;
+  }
+
+  &.done {
+    background-color: #94ff6a;
+  }
+}
+.title {
+  display: grid;
+  grid-template-columns: 2fr repeat(5, 1fr);
+  height: 40px;
+  font-size: 16px;
+  font-weight: 700;
+  border-bottom: 1px solid #ffe3a5;
+  padding-right: 20px;
+  width: calc(100% - 10px);
+}
+.icon {
+  width: 20px;
+}
+.scroll {
+  max-height: 200px;
+}

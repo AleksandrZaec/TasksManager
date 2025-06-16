@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { validation } from '../../items/form-field/validation';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../../route/Routes';
+import { Button } from '../../items/button/Button';
 type FormValues = {
   email: string;
   password: string;
@@ -95,7 +96,7 @@ export const Register = () => {
           showTooltip={showTooltip}
           onBlur={handleInputInteraction}
         />
-        <button className={s.button}>Регистрация</button>
+        <Button type={'outline'}>Регистрация</Button>
         <p className={s.title__sub}>
           Есть личный кабинет? Тогда{' '}
           <span className={s.title__sub__reg} onClick={handleNavRegister}>

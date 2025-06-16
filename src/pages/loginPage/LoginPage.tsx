@@ -1,5 +1,5 @@
 import s from './LoginPage.module.scss';
-import man from '../../public/images/man.png';
+import man from '/images/man.png';
 import { Login } from '../../components/login/Login';
 export const LoginPage = () => {
   return (

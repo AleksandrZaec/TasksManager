@@ -1,8 +1,8 @@
 import { forwardRef, useState } from 'react';
 import s from './Input.module.scss';
 import clsx from 'clsx';
-import closeEye from '../../public/icons/close_eye.png';
-import openEye from '../../public/icons/open_eye.png';
+import closeEye from '/icons/close_eye.png';
+import openEye from '/icons/open_eye.png';
 type InputProps = {
   label: string;
   placeholder: string;

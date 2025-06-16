@@ -1,5 +1,5 @@
 import s from '../loginPage/LoginPage.module.scss';
-import woman from '../../public/images/woman.png';
+import woman from '/images/woman.png';
 import { Register } from '../../components/register/Register';
 
 export const RegisterPage = () => {

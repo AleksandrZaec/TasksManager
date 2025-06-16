@@ -1,0 +1,32 @@
+@use '../../styles//styles.scss' as *;
+
+.container {
+  position: relative;
+  height: 100vh;
+  background-color: #fff3d3;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+.backround {
+  position: absolute;
+  z-index: 0;
+}
+.blob1 {
+  top: 40%;
+  width: 50%;
+  left: -10%;
+}
+.blob2 {
+  left: 70%;
+  width: 25%;
+}
+.blob3 {
+  top: 40%;
+  left: 80%;
+  width: 40%;
+}
+.content {
+  position: relative;
+  z-index: 1;
+}

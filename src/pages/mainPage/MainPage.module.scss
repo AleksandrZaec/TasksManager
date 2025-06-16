@@ -1,0 +1,8 @@
+@use '../../styles//styles.scss' as *;
+
+.comtainer {
+  width: 100%;
+  height: 100vh;
+  background-color: #fff3d3;
+  overflow-y: auto;
+}
