@@ -64,3 +64,5 @@ class TaskFilter(BaseModel):
     """Schema for filters for user-related tasks."""
     statuses: Optional[List[TaskStatus]] = None
     priorities: Optional[List[TaskPriority]] = None
+    team_id: Optional[int] = None
+
