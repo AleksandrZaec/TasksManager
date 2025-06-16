@@ -10,7 +10,7 @@ export const Header = ({ children }: HeaderProps) => {
     <div className={s.container}>
       <div className={s.menu}>
         <Block extraClass={s.header}>
-          <Button>Добавить команду</Button>
+          <Button type={'outline'} icon={true} extraClass={s.button}>Добавить команду</Button>
           <p>Список команд</p>
           <p>Календарь</p>
           <p>Встречи</p>

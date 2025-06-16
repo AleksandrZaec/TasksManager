@@ -36,7 +36,7 @@ export const TaskList = ({ data }: TaskTableProps) => {
                 <p>{columnList}</p>
               ))}
             </div>
-            <Scroll className={s.scroll}>
+            <Scroll extraClass={s.scroll}>
               {data[statusList.status].map((task) => (
                 <div key={task.id}>
                   <Task task={task} />
@@ -44,7 +44,7 @@ export const TaskList = ({ data }: TaskTableProps) => {
               ))}
             </Scroll>
           </div>
-          <Button>Добавить задачу</Button>
+          <Button type={'text'} icon={true} extraClass={s.button}>Добавить задачу</Button>
         </Block>
       ))}
     </div>

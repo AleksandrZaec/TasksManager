@@ -96,7 +96,7 @@ export const Register = () => {
           showTooltip={showTooltip}
           onBlur={handleInputInteraction}
         />
-        <Button>Регистрация</Button>
+        <Button type={'outline'}>Регистрация</Button>
         <p className={s.title__sub}>
           Есть личный кабинет? Тогда{' '}
           <span className={s.title__sub__reg} onClick={handleNavRegister}>

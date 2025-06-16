@@ -23,3 +23,14 @@
 .content {
   height: 100%;
 }
+
+.button {
+  background-color: #ffc64b;
+  color: white;
+  img {
+    content: url('/icons/plus-white.png');
+  }
+  &:hover {
+    background-color: #ffae00;
+  }
+}

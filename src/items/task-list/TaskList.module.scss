@@ -17,7 +17,7 @@
   margin-bottom: 10px;
   font-size: 18px;
   &.pending {
-    background-color: #acacac;
+    background-color: #cecece;
   }
 
   &.inProgress {
@@ -25,7 +25,7 @@
   }
 
   &.done {
-    background-color: #69eb36;
+    background-color: #94ff6a;
   }
 }
 .title {

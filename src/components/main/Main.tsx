@@ -13,9 +13,11 @@ export const Main = () => {
     <Header>
       <div className={s.content}>
         <div className={s.main}>
-          <h1>Название комнаты</h1>
+          <h1>Название команды</h1>
           <p>Участников: 10</p>
-          <Button>Добавить участников</Button>
+          <Button type={'outline'} extraClass={s.button} icon={true}>
+            Добавить участников
+          </Button>
         </div>
         <div className={s.main}>
           <p>Список задач</p>

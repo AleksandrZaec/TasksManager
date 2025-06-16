@@ -82,7 +82,7 @@ export const Login = () => {
           showTooltip={showTooltip}
           onBlur={handleInputInteraction}
         />
-        <Button>Войти</Button>
+        <Button type={'outline'}>Войти</Button>
         <p className={s.title__sub}>
           Нет личного кабинета? Тогда{' '}
           <span className={s.title__sub__reg} onClick={handleNavRegister}>

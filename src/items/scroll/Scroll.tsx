@@ -3,13 +3,13 @@ import s from './scroll.module.scss';
 import { forwardRef, ReactNode } from 'react';
 
 type ScrollProps = {
-  className?: string;
+  extraClass?: string;
   children: ReactNode;
 };
-export const Scroll = forwardRef<HTMLDivElement, ScrollProps>(({ className, children }, ref) => {
+export const Scroll = forwardRef<HTMLDivElement, ScrollProps>(({ extraClass, children }, ref) => {
   return (
     <div className={s.scrollBox}>
-      <div className={clsx(s.scroll, className)} ref={ref}>
+      <div className={clsx(s.scroll, extraClass)} ref={ref}>
         {children}
       </div>
     </div>
