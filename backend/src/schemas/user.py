@@ -66,6 +66,19 @@ class UserUpdate(BaseModel):
     last_name: Optional[str] = None
     password: Optional[str] = None
 
+    @field_validator('password')
+    @classmethod
+    def password_strong(cls, value: Optional[str]) -> Optional[str]:
+        if value is None:
+            return value
+        if len(value) < 8:
+            raise ValueError('Password must be at least 8 characters long')
+        if not re.search(r'[A-Z]', value):
+            raise ValueError('Password must contain at least one uppercase letter')
+        if not re.search(r'[^A-Za-z0-9]', value):
+            raise ValueError('Password must contain at least one special character')
+        return value
+
 
 class UserPayload(BaseModel):
     """The payload model for the JWT token."""

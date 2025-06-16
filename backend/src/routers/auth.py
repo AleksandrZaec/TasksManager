@@ -54,7 +54,7 @@ async def refresh_token(
         token_data = await decode_refresh_token(refresh_token)
         new_access_token = create_access_token(
             data={
-                "sub": token_data["user_id"],
+                "sub": str(token_data["user_id"]),
                 "role": token_data["role"],
                 "teams": token_data["teams"]
             }

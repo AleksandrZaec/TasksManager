@@ -2,6 +2,7 @@ from typing import Optional, List
 from datetime import datetime
 from pydantic import BaseModel
 from backend.src.models.enum import TaskStatus, TaskPriority
+from backend.src.schemas.task_user import AssigneeInfo
 
 
 class TaskBase(BaseModel):
@@ -44,12 +45,12 @@ class TaskShortRead(BaseModel):
 
 
 class TaskRead(TaskBase):
-    """Detailed schema for a task, includes assignees and creator email."""
+    """Detailed schema for a task, includes assignees with role and assigned time."""
     id: int
     creator_email: str
     created_at: datetime
     updated_at: Optional[datetime]
-    assignees: List[str] = []
+    assignees: List[AssigneeInfo] = []
 
     class Config:
         from_attributes = True

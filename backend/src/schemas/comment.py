@@ -7,11 +7,6 @@ class CommentBase(BaseModel):
     content: str
 
 
-class CommentCreate(CommentBase):
-    """Schema for create comment."""
-    task_id: int
-
-
 class CommentRead(CommentBase):
     """Schema for read comment."""
     id: int

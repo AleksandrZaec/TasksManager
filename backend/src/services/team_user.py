@@ -49,7 +49,7 @@ class TeamUserCRUD(BaseCRUD):
         return {"msg": "User added to team"}
 
     async def remove_user(self, db: AsyncSession, team_id: int, user_id: int) -> None:
-        """Remove a user from a team. No error if user not found."""
+        """Remove a user from a team."""
         stmt = delete(TeamUserAssociation).where(
             TeamUserAssociation.team_id == team_id,
             TeamUserAssociation.user_id == user_id)

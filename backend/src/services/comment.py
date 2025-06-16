@@ -1,7 +1,7 @@
 from typing import List
 from sqlalchemy.ext.asyncio import AsyncSession
 from backend.src.models import Comment
-from backend.src.schemas.comment import CommentCreate, CommentRead
+from backend.src.schemas.comment import CommentRead, CommentBase
 from backend.src.services.basecrud import BaseCRUD
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
@@ -13,14 +13,18 @@ class CommentCRUD(BaseCRUD):
     def __init__(self):
         super().__init__(Comment, CommentRead)
 
-    async def create_comment(self, db: AsyncSession, obj_in: CommentCreate, author_id: int) -> CommentRead:
+    async def create_comment(self, db: AsyncSession, task_id: int, obj_in: CommentBase, author_id: int) -> CommentRead:
         """Create a new comment with the given author ID."""
-        comment = obj_in.model_dump()
-        comment["author_id"] = author_id
-        comment = Comment(**comment)
+        data = obj_in.model_dump()
+        data["author_id"] = author_id
+        data["task_id"] = task_id
+
+        comment = Comment(**data)
         db.add(comment)
         await db.commit()
         await db.refresh(comment)
+
+        await db.refresh(comment, attribute_names=["author"])
         return CommentRead.model_validate(comment)
 
     async def get_comments_by_task(self, db: AsyncSession, task_id: int) -> List[CommentRead]:

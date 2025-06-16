@@ -10,7 +10,7 @@ from backend.src.services.team_user import team_users_crud
 router = APIRouter()
 
 
-@router.post("/", response_model=TeamRead, status_code=201)
+@router.post("/", response_model=TeamRead, status_code=status.HTTP_201_CREATED)
 async def create_team(team_in: TeamCreate, db: AsyncSession = Depends(get_db)) -> TeamRead:
     """Create a new team."""
     return await teams_crud.create(db, team_in)
@@ -41,7 +41,7 @@ async def delete_team(team_id: int, db: AsyncSession = Depends(get_db)) -> None:
     return None
 
 
-@router.post("/{team_id}/users")
+@router.post("/{team_id}/users", status_code=status.HTTP_201_CREATED)
 async def add_user_to_team(team_id: int, user_data: TeamUserAdd, db: AsyncSession = Depends(get_db)) -> Dict[str, str]:
     """Add a user to a team with a specified role."""
     return await team_users_crud.add_user(db, team_id, user_data.email, user_data.role)
