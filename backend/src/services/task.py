@@ -93,7 +93,8 @@ class TaskCRUD(BaseCRUD):
             db: AsyncSession,
             user_id: int,
             statuses: Optional[List[TaskStatus]] = None,
-            priorities: Optional[List[TaskPriority]] = None
+            priorities: Optional[List[TaskPriority]] = None,
+            team_id: Optional[int] = None
     ) -> List[TaskShortRead]:
         """Retrieves the tasks that the user is associated with, using the filters"""
         stmt = (
@@ -107,8 +108,32 @@ class TaskCRUD(BaseCRUD):
                 )
             )
         )
+        if team_id is not None:
+            stmt = stmt.where(Task.team_id == team_id)
 
         if statuses:
+            stmt = stmt.where(Task.status.in_(statuses))
+        else:
+            stmt = stmt.where(Task.status.in_([TaskStatus.OPEN, TaskStatus.IN_PROGRESS]))
+
+        if priorities:
+            stmt = stmt.where(Task.priority.in_(priorities))
+
+        result = await db.execute(stmt)
+        tasks = result.scalars().all()
+        return [TaskShortRead.model_validate(task) for task in tasks]
+
+    async def get_team_tasks(
+            self,
+            db: AsyncSession,
+            team_id: int,
+            statuses: Optional[List[TaskStatus]] = None,
+            priorities: Optional[List[TaskPriority]] = None
+    ) -> List[TaskShortRead]:
+        """Retrieve all tasks for a given team with optional filters."""
+        stmt = select(Task).where(Task.team_id == team_id)
+
+        if statuses is not None:
             stmt = stmt.where(Task.status.in_(statuses))
         else:
             stmt = stmt.where(Task.status.in_([TaskStatus.OPEN, TaskStatus.IN_PROGRESS]))

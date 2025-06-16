@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
-from typing import List
+from typing import List, Optional
+from backend.src.models import TaskStatus, TaskPriority
 from backend.src.services.auth import get_current_user
 from backend.src.services.task import tasks_crud
 from backend.src.schemas.task import TaskCreate, TaskUpdate, TaskRead, TaskShortRead, TaskStatusUpdate, TaskFilter
@@ -78,9 +79,9 @@ async def update_task_status(
     )
 
 
-@router.post("/my", response_model=List[TaskShortRead])
+@router.get("/my", response_model=List[TaskShortRead])
 async def get_my_tasks(
-        filters: TaskFilter,
+        filters: TaskFilter = Depends(),
         db: AsyncSession = Depends(get_db),
         current_user: User = Depends(get_current_user)
 ) -> List[TaskShortRead]:
@@ -89,5 +90,22 @@ async def get_my_tasks(
         db=db,
         user_id=current_user.id,
         statuses=filters.statuses,
-        priorities=filters.priorities
+        priorities=filters.priorities,
+        team_id=filters.team_id
+    )
+
+
+@router.get("/teams/{team_id}/tasks", response_model=List[TaskShortRead])
+async def get_tasks_for_team(
+        team_id: int,
+        statuses: Optional[List[TaskStatus]] = Query(None),
+        priorities: Optional[List[TaskPriority]] = Query(None),
+        db: AsyncSession = Depends(get_db),
+) -> List[TaskShortRead]:
+    """Retrieve all tasks for a specific team."""
+    return await tasks_crud.get_team_tasks(
+        db=db,
+        team_id=team_id,
+        statuses=statuses,
+        priorities=priorities
     )
