@@ -1,4 +1,5 @@
 import { Block } from '../../items/block/Block';
+import { Button } from '../../items/button/Button';
 import { Header } from '../header/Header';
 import s from './Main.module.scss';
 
@@ -17,15 +18,15 @@ export const Main = () => {
           <Block>
             <h1>Ожидает</h1>
             <div></div>
-            <button>Добавить задачу</button>
+            <Button>Добавить задачу</Button>
           </Block>
           <Block>
             <h1>В разработке</h1>
-            <button>Добавить задачу</button>
+            <Button>Добавить задачу</Button>
           </Block>
           <Block>
             <h1>Готово</h1>
-            <button>Добавить задачу</button>
+            <Button>Добавить задачу</Button>
           </Block>
         </div>
       </div>
