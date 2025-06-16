@@ -2,9 +2,10 @@ from typing import List, Optional
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, or_
-from backend.src.models import Task, TaskStatus, TaskPriority, User
+from backend.src.models import Task, TaskStatus, TaskPriority, User, TaskAssigneeAssociation
 from backend.src.models.task_status_history import TaskStatusHistory
 from backend.src.schemas.task import TaskRead, TaskShortRead, TaskCreate
+from backend.src.schemas.task_user import AssigneeInfo
 from backend.src.services.basecrud import BaseCRUD
 from sqlalchemy.orm import selectinload
 
@@ -33,16 +34,26 @@ class TaskCRUD(BaseCRUD):
         return [TaskShortRead.model_validate(task) for task in tasks]
 
     async def get_by_id(self, db: AsyncSession, task_id: int) -> TaskRead:
-        """Retrieve a task by ID with its creator and assignees preloaded."""
+        """Retrieve a task by ID with full assignee info from the association table."""
         result = await db.execute(
             select(Task).options(
-                selectinload(Task.creator), selectinload(Task.assignees))
+                selectinload(Task.creator), selectinload(Task.assignee_associations)
+                .selectinload(TaskAssigneeAssociation.user))
             .where(Task.id == task_id))
 
         task = result.scalar_one_or_none()
 
         if not task:
             raise HTTPException(status_code=404, detail="Task not found")
+
+        assignees: list[AssigneeInfo] = [
+            AssigneeInfo.model_validate({
+                "email": assoc.user.email,
+                "assigned_at": assoc.assigned_at,
+                "role": assoc.role
+            })
+            for assoc in task.assignee_associations
+        ]
 
         task_data = {
             "id": task.id,
@@ -52,13 +63,13 @@ class TaskCRUD(BaseCRUD):
             "priority": task.priority,
             "due_date": task.due_date,
             "creator_email": task.creator.email if task.creator else None,
-            "assignees": [user.email for user in task.assignees],
             "team_id": task.team_id,
             "created_at": task.created_at,
             "updated_at": task.updated_at,
+            "assignees": assignees
         }
 
-        return TaskRead(**task_data)
+        return TaskRead.model_validate(task_data)
 
     async def update_status(
             self,

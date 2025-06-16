@@ -1,9 +1,8 @@
 from typing import List
-
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from backend.src.config.db import get_db
-from backend.src.schemas.comment import CommentRead, CommentCreate, CommentUpdate
+from backend.src.schemas.comment import CommentRead, CommentBase, CommentUpdate
 from backend.src.schemas.user import UserPayload
 from backend.src.services.auth import get_current_user
 from backend.src.services.comment import comment_crud
@@ -11,14 +10,15 @@ from backend.src.services.comment import comment_crud
 router = APIRouter()
 
 
-@router.post("/", response_model=CommentRead)
+@router.post("/{task_id}", response_model=CommentRead, status_code=status.HTTP_201_CREATED)
 async def create_comment(
-        comment_in: CommentCreate,
+        task_id: int,
+        comment_in: CommentBase,
         db: AsyncSession = Depends(get_db),
         user: UserPayload = Depends(get_current_user),
 ) -> CommentRead:
     """Create a new comment with the authenticated user as author."""
-    return await comment_crud.create_comment(db, comment_in, author_id=user.id)
+    return await comment_crud.create_comment(db, task_id, comment_in, user.id)
 
 
 @router.put("/{comment_id}", response_model=CommentRead)
@@ -38,6 +38,3 @@ async def delete_comment(comment_id: int, db: AsyncSession = Depends(get_db)) ->
 async def get_comments_by_task(task_id: int, db: AsyncSession = Depends(get_db)) -> List[CommentRead]:
     """Get all comments for a given task by task ID."""
     return await comment_crud.get_comments_by_task(db, task_id)
-
-
-
