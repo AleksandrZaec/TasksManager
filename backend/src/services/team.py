@@ -1,10 +1,9 @@
 import uuid
 from datetime import datetime, timedelta, timezone
-
 from backend.src.models import TeamUserAssociation
 from backend.src.models.team import Team
 from backend.src.schemas.task import TaskRead
-from backend.src.schemas.team import TeamCreate, TeamRead, TeamWithUsersAndTask
+from backend.src.schemas.team import TeamCreate, TeamRead, TeamWithUsersAndTask, TeamUpdate
 from backend.src.schemas.team_user import TeamUserAssociationRead
 from backend.src.services.basecrud import BaseCRUD
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -26,7 +25,7 @@ class TeamCRUD(BaseCRUD):
         unique_digits = str(uuid.uuid4().int)[:4]
         return f"{clean_name}-{unique_digits}"
 
-    async def create(self, db: AsyncSession, team: TeamCreate) -> TeamRead:
+    async def create_team(self, db: AsyncSession, team: TeamCreate) -> TeamRead:
         """Create a new Team ensuring unique name, with fallback on DB constraint."""
         result = await db.execute(select(Team).where(Team.name == team.name.strip()))
         existing_team = result.scalar_one_or_none()
@@ -71,6 +70,36 @@ class TeamCRUD(BaseCRUD):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Failed to create team after multiple attempts")
+
+    async def update_team(self, db: AsyncSession, team_id: int, team_in: TeamUpdate) -> TeamRead:
+        """Update a team. If name is updated — regenerate invite_code."""
+        result = await db.execute(select(Team).where(Team.id == team_id))
+        team = result.scalar_one_or_none()
+        if team is None:
+            raise HTTPException(status_code=404, detail="Team not found")
+
+        update_data = team_in.model_dump(exclude_unset=True)
+
+        if "name" in update_data:
+            update_data["name"] = update_data["name"].strip()
+            update_data["invite_code"] = self._generate_invite_code(update_data["name"])
+
+        for field, value in update_data.items():
+            setattr(team, field, value)
+
+        try:
+            await db.commit()
+            await db.refresh(team)
+        except IntegrityError as e:
+            await db.rollback()
+            err_msg = str(e.orig).lower()
+            if "teams_name_key" in err_msg:
+                raise HTTPException(status_code=400, detail="Team name already exists")
+            if "teams_invite_code_key" in err_msg:
+                raise HTTPException(status_code=400, detail="Invite code conflict, try again")
+            raise
+
+        return TeamRead.model_validate(team)
 
     async def get_by_id_with_relations(self, db: AsyncSession, team_id: int) -> TeamWithUsersAndTask:
         """Return team with flat user data and tasks"""

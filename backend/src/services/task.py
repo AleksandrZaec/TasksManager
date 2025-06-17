@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, or_
 from backend.src.models import Task, TaskStatus, TaskPriority, User, TaskAssigneeAssociation
 from backend.src.models.task_status_history import TaskStatusHistory
-from backend.src.schemas.task import TaskRead, TaskShortRead, TaskCreate
+from backend.src.schemas.task import TaskRead, TaskShortRead, TaskCreate, TaskUpdate
 from backend.src.schemas.task_user import AssigneeInfo
 from backend.src.services.basecrud import BaseCRUD
 from sqlalchemy.orm import selectinload
@@ -27,13 +27,31 @@ class TaskCRUD(BaseCRUD):
 
         return TaskShortRead.model_validate(task)
 
-    async def get_all(self, db: AsyncSession) -> List[TaskShortRead]:
+    async def update_task(self, db: AsyncSession, task_id: int, task_in: TaskUpdate, creator_id: int) -> TaskShortRead:
+        """Update an existing task and update the creator_id from the token."""
+        result = await db.execute(select(Task).where(Task.id == task_id))
+        task = result.scalar_one_or_none()
+        if task is None:
+            raise HTTPException(status_code=404, detail="Task not found")
+
+        task_data = task_in.model_dump(exclude_unset=True)
+        task_data["creator_id"] = creator_id
+
+        for field, value in task_data.items():
+            setattr(task, field, value)
+
+        await db.commit()
+        await db.refresh(task)
+
+        return TaskShortRead.model_validate(task)
+
+    async def get_all_task(self, db: AsyncSession) -> List[TaskShortRead]:
         """Retrieve all tasks from the database."""
         result = await db.execute(select(Task))
         tasks = result.scalars().all()
         return [TaskShortRead.model_validate(task) for task in tasks]
 
-    async def get_by_id(self, db: AsyncSession, task_id: int) -> TaskRead:
+    async def get_task_by_id(self, db: AsyncSession, task_id: int) -> TaskRead:
         """Retrieve a task by ID with full assignee info from the association table."""
         result = await db.execute(
             select(Task).options(

@@ -1,4 +1,5 @@
-from sqlalchemy import ForeignKey, DateTime, Integer, Text, CheckConstraint, UniqueConstraint, func
+from typing import List
+from sqlalchemy import ForeignKey, DateTime, Integer, Text, CheckConstraint, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from datetime import datetime, timezone
 from backend.src.config.db import Base
@@ -9,7 +10,7 @@ class Evaluation(Base):
     __tablename__ = "evaluations"
     __table_args__ = (
         UniqueConstraint("task_id", "evaluator_id", name="unique_task_evaluator"),
-        CheckConstraint('score >= 1 AND score <= 5', name='check_score_range')
+        CheckConstraint('score BETWEEN 1 AND 5', name='check_score_range')
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -33,14 +34,14 @@ class Evaluation(Base):
     task: Mapped["Task"] = relationship(
         "Task",
         back_populates="evaluations",
-        cascade="save-update"
     )
+
     evaluator: Mapped["User"] = relationship(
         "User",
         back_populates="evaluations_given",
-        cascade="save-update"
     )
 
-    @classmethod
-    def average_score(cls, session, task_id: int) -> float:
-        return session.query(func.avg(cls.score)).filter_by(task_id=task_id).scalar()
+    recipients: Mapped[List["EvaluationAssociation"]] = relationship(
+        back_populates="evaluation",
+        cascade="all, delete-orphan"
+    )

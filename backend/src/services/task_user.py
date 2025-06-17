@@ -1,8 +1,9 @@
+from typing import List
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, delete, update
 from fastapi import HTTPException, status
-from backend.src.models.association import TaskAssigneeAssociation
-from backend.src.schemas.task_user import TaskAssigneeCreate, TaskAssigneeRead
+from backend.src.models import TaskAssigneeAssociation, User
+from backend.src.schemas.task_user import TaskAssigneeRead, TaskUserAdd
 from backend.src.services.basecrud import BaseCRUD
 
 
@@ -12,32 +13,46 @@ class TaskAssigneeCRUD(BaseCRUD):
     def __init__(self):
         super().__init__(TaskAssigneeAssociation, TaskAssigneeRead)
 
-    async def add_executor(self, db: AsyncSession, task_id: int, obj_in: TaskAssigneeCreate) -> dict:
-        """Add a user as an executor to a task."""
-        stmt = select(TaskAssigneeAssociation).where(
-            TaskAssigneeAssociation.task_id == task_id,
-            TaskAssigneeAssociation.user_id == obj_in.user_id
-        )
+    async def add_executors(self, db: AsyncSession, task_id: int, obj_in: List[TaskUserAdd]) -> dict:
+        """Add users as executors to a task by their emails with optional roles."""
+        emails = [user.email for user in obj_in]
 
+        stmt = select(User.id, User.email).where(User.email.in_(emails))
         result = await db.execute(stmt)
-        existing = result.scalar_one_or_none()
+        user_map = {email: user_id for user_id, email in result.all()}
 
-        if existing:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="User already assigned to this task"
+        stmt = select(TaskAssigneeAssociation.user_id).where(TaskAssigneeAssociation.task_id == task_id)
+        result = await db.execute(stmt)
+        existing_user_ids = set(result.scalars().all())
+
+        new_assocs = []
+        added_emails = []
+        errors = []
+
+        for assignee in obj_in:
+            user_id = user_map.get(assignee.email)
+            if not user_id:
+                errors.append(f"User with email {assignee.email} not found")
+                continue
+            if user_id in existing_user_ids:
+                errors.append(f"User {assignee.email} is already assigned to the task")
+                continue
+
+            assoc = TaskAssigneeAssociation(
+                task_id=task_id,
+                user_id=user_id,
+                role=assignee.role or "executor"
             )
+            new_assocs.append(assoc)
+            added_emails.append(assignee.email)
 
-        assoc = TaskAssigneeAssociation(
-            task_id=task_id,
-            user_id=obj_in.user_id,
-            role=obj_in.role,
-        )
+        if not new_assocs:
+            raise HTTPException(status_code=400, detail="No new users to add or all users already assigned")
 
-        db.add(assoc)
+        db.add_all(new_assocs)
         await db.commit()
 
-        return {"msg": "Executor is appointed"}
+        return {"added": added_emails, "errors": errors}
 
     async def remove_executor(self, db: AsyncSession, task_id: int, user_id: int) -> None:
         """Remove a user as an executor from a task."""

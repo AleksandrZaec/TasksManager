@@ -20,10 +20,14 @@ class Task(Base):
     status: Mapped[TaskStatus] = mapped_column(Enum(TaskStatus), default=TaskStatus.OPEN, nullable=False)
     priority: Mapped[TaskPriority] = mapped_column(Enum(TaskPriority), default=TaskPriority.MEDIUM)
     due_date: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
-    team_id: Mapped[int] = mapped_column(ForeignKey("teams.id"), nullable=False)
+    team_id: Mapped[int] = mapped_column(ForeignKey("teams.id", ondelete="CASCADE"), nullable=False)
     team: Mapped["Team"] = relationship("Team", back_populates="tasks")
     creator: Mapped["User"] = relationship("User", foreign_keys=[creator_id], back_populates="created_tasks")
-    assignee_associations: Mapped[List["TaskAssigneeAssociation"]] = relationship(back_populates="task")
+    assignee_associations: Mapped[List["TaskAssigneeAssociation"]] = relationship(
+        back_populates="task",
+        cascade="all, delete-orphan",
+        passive_deletes=True
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
@@ -59,4 +63,3 @@ class Task(Base):
         back_populates="task",
         cascade="all, delete-orphan"
     )
-

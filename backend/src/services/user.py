@@ -1,9 +1,9 @@
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from backend.src.models import TeamUserAssociation
 from backend.src.utils.security import pwd_context
 from backend.src.services.basecrud import BaseCRUD
-from backend.src.models.association import TeamUserAssociation
 from backend.src.models.enum import UserRole
 from backend.src.models.user import User
 from backend.src.schemas.user import UserCreate, UserRead, UserUpdate, UserReadWithTeams, UserTeamRead

@@ -1,10 +1,11 @@
 from typing import List
 from sqlalchemy.ext.asyncio import AsyncSession
 from backend.src.models import Comment
-from backend.src.schemas.comment import CommentRead, CommentBase
+from backend.src.schemas.comment import CommentRead, CommentBase, CommentUpdate
 from backend.src.services.basecrud import BaseCRUD
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
+from fastapi import HTTPException
 
 
 class CommentCRUD(BaseCRUD):
@@ -14,7 +15,6 @@ class CommentCRUD(BaseCRUD):
         super().__init__(Comment, CommentRead)
 
     async def create_comment(self, db: AsyncSession, task_id: int, obj_in: CommentBase, author_id: int) -> CommentRead:
-        """Create a new comment with the given author ID."""
         data = obj_in.model_dump()
         data["author_id"] = author_id
         data["task_id"] = task_id
@@ -22,9 +22,41 @@ class CommentCRUD(BaseCRUD):
         comment = Comment(**data)
         db.add(comment)
         await db.commit()
-        await db.refresh(comment)
 
-        await db.refresh(comment, attribute_names=["author"])
+        result = await db.execute(
+            select(Comment)
+            .where(Comment.id == comment.id)
+            .options(selectinload(Comment.author))
+        )
+        comment_with_author = result.scalar_one()
+
+        return CommentRead.model_validate(comment_with_author)
+
+    async def update_comment(
+            self,
+            db: AsyncSession,
+            comment_id: int,
+            comment_in: CommentUpdate,
+            user_id: int,
+    ) -> CommentRead:
+        """Update comment content. Only the author can update their comment."""
+        result = await db.execute(
+            select(Comment)
+            .where(Comment.id == comment_id)
+            .options(selectinload(Comment.author))
+        )
+        comment: Comment | None = result.scalar_one_or_none()
+
+        if not comment:
+            raise HTTPException(status_code=404, detail="Comment not found")
+
+        if comment.author_id != user_id:
+            raise HTTPException(status_code=403, detail="You are not the author of this comment")
+
+        comment.content = comment_in.content
+
+        await db.commit()
+
         return CommentRead.model_validate(comment)
 
     async def get_comments_by_task(self, db: AsyncSession, task_id: int) -> List[CommentRead]:
@@ -36,16 +68,6 @@ class CommentCRUD(BaseCRUD):
             .options(selectinload(Comment.author))
         )
         comments = result.scalars().all()
-
-        # return [
-        #     CommentRead(
-        #         id=c.id,
-        #         content=c.content,
-        #         created_at=c.created_at,
-        #         author_full_name=f"{c.author.first_name} {c.author.last_name}"
-        #     )
-        #     for c in comments
-        # ]
 
         return [CommentRead.model_validate(c) for c in comments]
 

@@ -29,15 +29,16 @@ class TaskUpdate(BaseModel):
     description: Optional[str] = None
     priority: Optional[TaskPriority] = None
     due_date: Optional[datetime] = None
+    status: Optional[TaskStatus] = None
 
 
 class TaskShortRead(BaseModel):
     """Schema for listing tasks."""
     title: str
-    description: Optional[str]
+    description: Optional[str] = None
     status: TaskStatus
     priority: TaskPriority
-    due_date: Optional[datetime]
+    due_date: Optional[datetime] = None
     id: int
 
     class Config:
@@ -49,7 +50,7 @@ class TaskRead(TaskBase):
     id: int
     creator_email: str
     created_at: datetime
-    updated_at: Optional[datetime]
+    updated_at: Optional[datetime] = None
     assignees: List[AssigneeInfo] = []
 
     class Config:
