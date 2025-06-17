@@ -22,9 +22,14 @@ async def create_comment(
 
 
 @router.put("/{comment_id}", response_model=CommentRead)
-async def update_comment(comment_id: int, comment_in: CommentUpdate, db: AsyncSession = Depends(get_db)) -> CommentRead:
+async def update_comment(
+        comment_id: int,
+        comment_in: CommentUpdate,
+        db: AsyncSession = Depends(get_db),
+        user: UserPayload = Depends(get_current_user),
+) -> CommentRead:
     """Update an existing comment by its ID."""
-    return await comment_crud.update(db, comment_id, comment_in)
+    return await comment_crud.update_comment(db, comment_id, comment_in, user.id)
 
 
 @router.delete("/{comment_id}", status_code=status.HTTP_204_NO_CONTENT)

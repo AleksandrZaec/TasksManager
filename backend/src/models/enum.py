@@ -16,10 +16,10 @@ class TaskStatus(str, enum.Enum):
 
 class TaskPriority(str, enum.Enum):
     """Priority levels for tasks."""
-    LOW = "LOW"
-    MEDIUM = "MEDIUM"
-    HIGH = "HIGH"
-    CRITICAL = "CRITICAL"
+    LOW = "low"
+    MEDIUM = "medium"
+    HIGH = "high"
+    CRITICAL = "critical"
 
 
 class MeetingStatus(str, enum.Enum):
@@ -30,5 +30,5 @@ class MeetingStatus(str, enum.Enum):
 
 class TeamRole(str, enum.Enum):
     """ enum for users role in tems"""
-    EXECUTOR = "EXECUTOR"
-    MANAGER = "MANAGER"
+    EXECUTOR = "executor"
+    MANAGER = "manager"

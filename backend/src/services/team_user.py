@@ -1,9 +1,10 @@
-from backend.src.models import User
+from typing import List
+from backend.src.models import User, TeamUserAssociation, TeamRole
+from backend.src.schemas.user import UserRead
 from backend.src.services.basecrud import BaseCRUD
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from backend.src.models.association import TeamUserAssociation, TeamRole
-from backend.src.schemas.team_user import TeamUserAssociationRead
+from backend.src.schemas.team_user import TeamUserAssociationRead, TeamUserAdd
 from sqlalchemy import select, delete, update
 
 
@@ -13,40 +14,52 @@ class TeamUserCRUD(BaseCRUD):
     def __init__(self):
         super().__init__(TeamUserAssociation, TeamUserAssociationRead)
 
-    async def add_user(self, db: AsyncSession, team_id: int, email: str, role: TeamRole = TeamRole.EXECUTOR) -> dict:
-        """Add a user to a team with a specific role. Raise if already exists."""
-        stmt = select(User.id).where(User.email == email)
+    async def add_users_bulk(
+            self,
+            db: AsyncSession,
+            team_id: int,
+            users: List[TeamUserAdd],
+    ) -> dict:
+        """Add multiple users to a team with roles."""
+        added_emails = []
+        errors = []
+
+        emails = [user.email for user in users]
+
+        stmt = select(User.id, User.email).where(User.email.in_(emails))
         result = await db.execute(stmt)
-        user_id = result.scalar_one_or_none()
+        existing_users = {email: user_id for user_id, email in result.all()}
 
-        if user_id is None:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="User with this email not found"
-            )
-
-        stmt = select(TeamUserAssociation).where(
+        stmt = select(TeamUserAssociation.user_id).where(
             TeamUserAssociation.team_id == team_id,
-            TeamUserAssociation.user_id == user_id)
-
+            TeamUserAssociation.user_id.in_(existing_users.values()))
         result = await db.execute(stmt)
-        existing_assoc = result.scalar_one_or_none()
+        existing_assocs = {row[0] for row in result.all()}
 
-        if existing_assoc:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="User is already a member of the team"
+        for user_data in users:
+            user_id = existing_users.get(user_data.email)
+            if user_id is None:
+                errors.append(f"User with email {user_data.email} not found")
+                continue
+            if user_id in existing_assocs:
+                errors.append(f"User {user_data.email} is already a member of the team")
+                continue
+
+            new_assoc = TeamUserAssociation(
+                team_id=team_id,
+                user_id=user_id,
+                role=user_data.role or TeamRole.EXECUTOR
             )
+            db.add(new_assoc)
+            added_emails.append(user_data.email)
 
-        new_assoc = TeamUserAssociation(
-            team_id=team_id,
-            user_id=user_id,
-            role=role
-        )
-        db.add(new_assoc)
-        await db.commit()
+        try:
+            await db.commit()
+        except Exception as e:
+            await db.rollback()
+            raise HTTPException(status_code=500, detail=f"Database error: {e}")
 
-        return {"msg": "User added to team"}
+        return {"added": added_emails, "errors": errors}
 
     async def remove_user(self, db: AsyncSession, team_id: int, user_id: int) -> None:
         """Remove a user from a team."""
@@ -75,64 +88,17 @@ class TeamUserCRUD(BaseCRUD):
 
         return {"msg": "User role updated"}
 
+    async def get_team_users(self, db: AsyncSession, team_id: int) -> list[UserRead]:
+        """Return all users who belong to a team."""
+        stmt = (
+            select(User)
+            .join(TeamUserAssociation, TeamUserAssociation.user_id == User.id)
+            .where(TeamUserAssociation.team_id == team_id)
+        )
+
+        result = await db.execute(stmt)
+        users = result.scalars().all()
+        return [UserRead.model_validate(user) for user in users]
+
 
 team_users_crud = TeamUserCRUD()
-
-# async def add_users_bulk(self, db: AsyncSession, team_id: int, user_emails: list[str]) -> dict:
-#     """Add users to a team by email. All will get default role. Skip already existing ones."""
-#
-#     if not user_emails:
-#         return {"msg": "No emails provided", "added": 0, "skipped": 0}
-#
-#     stmt = select(User.id, User.email).where(User.email.in_(user_emails))
-#     result = await db.execute(stmt)
-#     users = result.all()  # list of (id, email)
-#
-#     email_to_id = {email: uid for uid, email in users}
-#     found_emails = set(email_to_id.keys())
-#
-#     missing_emails = set(user_emails) - found_emails
-#     if missing_emails:
-#         raise HTTPException(
-#             status_code=404,
-#             detail=f"Users with these emails not found: {', '.join(missing_emails)}"
-#         )
-#
-#     user_ids = list(email_to_id.values())
-#
-#     stmt = select(TeamUserAssociation.user_id).where(
-#         TeamUserAssociation.team_id == team_id,
-#         TeamUserAssociation.user_id.in_(user_ids)
-#     )
-#     result = await db.execute(stmt)
-#     existing_user_ids = {row[0] for row in result.all()}
-#
-#     new_user_ids = [uid for uid in user_ids if uid not in existing_user_ids]
-#
-#     if new_user_ids:
-#         stmt = insert(TeamUserAssociation).values([
-#             {"team_id": team_id, "user_id": uid} for uid in new_user_ids
-#         ])
-#         await db.execute(stmt)
-#         await db.commit()
-#
-#     return {
-#         "msg": f"{len(new_user_ids)} users added",
-#         "added": len(new_user_ids),
-#         "skipped": len(user_ids) - len(new_user_ids)
-#     }
-#
-# async def remove_users_bulk(self, db: AsyncSession, team_id: int, user_ids: list[int]) -> dict:
-#     """Remove a users from a team. No error if user not found."""
-#     if not user_ids:
-#         return {"msg": "No user IDs provided", "deleted": 0}
-#
-#     stmt = delete(TeamUserAssociation).where(
-#         TeamUserAssociation.team_id == team_id,
-#         TeamUserAssociation.user_id.in_(user_ids))
-#
-#     result = await db.execute(stmt)
-#     await db.commit()
-#
-#     return {"msg": f"{result.rowcount} users removed from team", "deleted": result.rowcount}
-

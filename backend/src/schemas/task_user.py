@@ -1,6 +1,8 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
+
+from backend.src.models import TeamRole
 
 
 class AssigneeInfo(BaseModel):
@@ -13,10 +15,15 @@ class AssigneeInfo(BaseModel):
         from_attributes = True
 
 
-class TaskAssigneeCreate(BaseModel):
-    """Schema for creating a task-assignee association."""
-    user_id: int
+class TaskUserAdd(BaseModel):
+    """User email and optional role for task assignment."""
+    email: EmailStr
     role: Optional[str] = None
+
+
+class TaskAssigneeCreate(BaseModel):
+    """List of users to assign to a task."""
+    users: List[TaskUserAdd]
 
 
 class TaskAssigneeRead(AssigneeInfo):
@@ -24,7 +31,10 @@ class TaskAssigneeRead(AssigneeInfo):
     assigned_at: datetime
 
 
+
+
 class RoleUpdatePayload(BaseModel):
     """For update role executor in task"""
     new_role: str
+
 

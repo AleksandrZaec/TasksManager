@@ -3,6 +3,7 @@ from typing import Optional, List
 from pydantic import BaseModel, Field, field_validator
 from backend.src.schemas.task import TaskRead
 from backend.src.schemas.team_user import TeamUserAssociationRead
+from datetime import datetime
 
 
 class TeamBase(BaseModel):
@@ -33,10 +34,10 @@ class TeamCreate(TeamBase):
 
 
 class TeamUpdate(BaseModel):
-    """Schema for updating team fields."""
-    name: Optional[str] = Field(None, max_length=50)
-    description: Optional[str] = Field(None, max_length=200)
-    # is_active: Optional[bool] = None
+    """Schema for update a team."""
+    name: Optional[str] = None
+    description: Optional[str] = None
+    invite_code_expires_at: Optional[datetime] = None
 
 
 class TeamRead(BaseModel):
@@ -53,5 +54,3 @@ class TeamWithUsersAndTask(TeamRead):
     """Team with related users and tasks."""
     team_users: List[TeamUserAssociationRead] = Field(default_factory=list)
     tasks: List[TaskRead] = Field(default_factory=list)
-
-

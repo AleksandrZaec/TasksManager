@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 from pydantic import BaseModel, EmailStr
 from backend.src.models.enum import TeamRole
 
@@ -41,6 +41,17 @@ class TeamUserAdd(BaseModel):
     """Payload for adding a user to a team by email and role."""
     email: EmailStr
     role: TeamRole = TeamRole.EXECUTOR
+
+
+class AddUsersResponse(BaseModel):
+    """Response"""
+    added: List[EmailStr]
+    errors: List[str]
+
+
+class TeamUsersCreate(BaseModel):
+    """Payload for bulk adding users to a team by email and role."""
+    users: list[TeamUserAdd]
 
 
 class TeamUserUpdateRole(BaseModel):

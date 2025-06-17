@@ -34,7 +34,11 @@ class User(Base):
     evaluations_given: Mapped[List["Evaluation"]] = relationship(
         "Evaluation",
         back_populates="evaluator",
-        cascade="save-update, merge"
+    )
+
+    received_evaluations: Mapped[List["EvaluationAssociation"]] = relationship(
+        back_populates="user",
+        cascade="all, delete-orphan"
     )
 
     created_tasks: Mapped[List["Task"]] = relationship(
@@ -72,4 +76,3 @@ class User(Base):
         back_populates="creator",
         cascade="save-update, merge"
     )
-
