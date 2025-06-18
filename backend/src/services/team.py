@@ -4,13 +4,14 @@ from backend.src.models import TeamUserAssociation
 from backend.src.models.team import Team
 from backend.src.schemas.task import TaskRead
 from backend.src.schemas.team import TeamCreate, TeamRead, TeamWithUsersAndTask, TeamUpdate
-from backend.src.schemas.team_user import TeamUserAssociationRead
+from backend.src.schemas.team_user import TeamUserAssociationRead, TeamUserAdd
 from backend.src.services.basecrud import BaseCRUD
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from fastapi import HTTPException, status
 from sqlalchemy.orm import selectinload
+from backend.src.services.team_user import team_users_crud
 
 
 class TeamCRUD(BaseCRUD):
@@ -25,18 +26,19 @@ class TeamCRUD(BaseCRUD):
         unique_digits = str(uuid.uuid4().int)[:4]
         return f"{clean_name}-{unique_digits}"
 
-    async def create_team(self, db: AsyncSession, team: TeamCreate) -> TeamRead:
-        """Create a new Team ensuring unique name, with fallback on DB constraint."""
-        result = await db.execute(select(Team).where(Team.name == team.name.strip()))
+    async def create_team(self, db: AsyncSession, team_in: TeamCreate) -> TeamRead:
+        """Create a new Team"""
+        result = await db.execute(select(Team).where(Team.name == team_in.name.strip()))
         existing_team = result.scalar_one_or_none()
         if existing_team:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Team with this name already exists"
-            )
+                detail="Team with this name already exists")
 
-        team_data = team.model_dump()
+        team_data = team_in.model_dump(exclude={"users"})
         team_data["name"] = team_data["name"].strip()
+
+        users = team_in.users
 
         if team_data.get("invite_code_expires_at") is None:
             team_data["invite_code_expires_at"] = datetime.now(timezone.utc) + timedelta(days=7)
@@ -45,14 +47,24 @@ class TeamCRUD(BaseCRUD):
         for attempt in range(max_attempts):
             team_data["invite_code"] = self._generate_invite_code(team_data["name"])
             team = Team(**team_data)
+
             db.add(team)
             try:
                 await db.commit()
                 await db.refresh(team)
+
+                if users:
+                    try:
+                        await team_users_crud.add_users(db, team.id, users)
+                    except Exception as e:
+                        raise HTTPException(status_code=500, detail=f"Failed to add users to team: {e}")
+
                 return TeamRead.model_validate(team)
+
             except IntegrityError as e:
                 await db.rollback()
                 err_msg = str(e.orig).lower()
+
                 if "teams_name_key" in err_msg or ("unique constraint" in err_msg and "name" in err_msg):
                     raise HTTPException(
                         status_code=status.HTTP_400_BAD_REQUEST,

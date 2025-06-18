@@ -2,7 +2,7 @@ import re
 from typing import Optional, List
 from pydantic import BaseModel, Field, field_validator
 from backend.src.schemas.task import TaskRead
-from backend.src.schemas.team_user import TeamUserAssociationRead
+from backend.src.schemas.team_user import TeamUserAssociationRead, TeamUserAdd
 from datetime import datetime
 
 
@@ -31,6 +31,17 @@ class TeamBase(BaseModel):
 class TeamCreate(TeamBase):
     """Schema for creating a team."""
     description: str = Field(..., max_length=200)
+    users: Optional[List[TeamUserAdd]] = None
+
+    @field_validator("users")
+    @classmethod
+    def check_unique_user_ids(cls, users):
+        if users is None:
+            return users
+        user_ids = [u.user_id for u in users]
+        if len(user_ids) != len(set(user_ids)):
+            raise ValueError("Duplicate user_id in users")
+        return users
 
 
 class TeamUpdate(BaseModel):

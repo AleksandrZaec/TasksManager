@@ -10,15 +10,15 @@ from backend.src.config.db import get_db
 router = APIRouter()
 
 
-@router.post("/", response_model=TaskShortRead, status_code=status.HTTP_201_CREATED)
+@router.post("/teams/{team_id}/tasks/", response_model=TaskShortRead, status_code=status.HTTP_201_CREATED)
 async def create_task(
-        task_in: TaskCreate,
-        db: AsyncSession = Depends(get_db),
-        current_user: User = Depends(get_current_user)
+    team_id: int,
+    task_in: TaskCreate,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ) -> TaskShortRead:
-    print("USER IN CREATE TASK:", current_user)
-    """Create a new task."""
-    return await tasks_crud.create_task(db, task_in, current_user.id, task_in.team_id)
+    """Create a new task for a specific team."""
+    return await tasks_crud.create_task(db, task_in, current_user.id, team_id)
 
 
 @router.get("/", response_model=List[TaskShortRead])

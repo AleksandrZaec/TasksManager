@@ -8,6 +8,7 @@ from backend.src.schemas.task import TaskRead, TaskShortRead, TaskCreate, TaskUp
 from backend.src.schemas.task_user import AssigneeInfo
 from backend.src.services.basecrud import BaseCRUD
 from sqlalchemy.orm import selectinload
+from backend.src.services.task_user import task_user_crud
 
 
 class TaskCRUD(BaseCRUD):
@@ -16,7 +17,7 @@ class TaskCRUD(BaseCRUD):
 
     async def create_task(self, db: AsyncSession, task_in: TaskCreate, creator_id: int, team_id: int) -> TaskShortRead:
         """Create a new task with the given input, creator, and team."""
-        data = task_in.model_dump()
+        data = task_in.model_dump(exclude={"assignees"})
         data["creator_id"] = creator_id
         data["team_id"] = team_id
 
@@ -28,6 +29,12 @@ class TaskCRUD(BaseCRUD):
         except Exception as e:
             await db.rollback()
             raise HTTPException(status_code=500, detail=f"Database error: {e}")
+
+        if task_in.assignees:
+            try:
+                await task_user_crud.add_executors(db, task.id, task_in.assignees)
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=f"Failed to assign users: {e}")
 
         return TaskShortRead.model_validate(task)
 
