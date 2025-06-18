@@ -80,8 +80,12 @@ class EvaluationCRUD(BaseCRUD):
         evaluation.feedback = eva_in.feedback
         evaluation.updated_at = datetime.now(timezone.utc)
 
-        await db.commit()
-        await db.refresh(evaluation)
+        try:
+            await db.commit()
+            await db.refresh(evaluation)
+        except Exception as e:
+            await db.rollback()
+            raise HTTPException(status_code=500, detail=f"Database error: {e}")
 
         return EvaluationRead.model_validate(evaluation)
 

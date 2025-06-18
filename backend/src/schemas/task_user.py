@@ -1,13 +1,14 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel
 from datetime import datetime
 from typing import Optional, List
-
-from backend.src.models import TeamRole
 
 
 class AssigneeInfo(BaseModel):
     """Base schema for task assignee information."""
+    id: int
     email: str
+    first_name: str
+    last_name: str
     role: Optional[str] = None
     assigned_at: datetime
 
@@ -16,8 +17,8 @@ class AssigneeInfo(BaseModel):
 
 
 class TaskUserAdd(BaseModel):
-    """User email and optional role for task assignment."""
-    email: EmailStr
+    """User ID and optional role for task assignment."""
+    user_id: int
     role: Optional[str] = None
 
 
@@ -26,15 +27,42 @@ class TaskAssigneeCreate(BaseModel):
     users: List[TaskUserAdd]
 
 
-class TaskAssigneeRead(AssigneeInfo):
-    """Schema for reading task assignee"""
-    assigned_at: datetime
-
-
-
-
 class RoleUpdatePayload(BaseModel):
     """For update role executor in task"""
     new_role: str
 
 
+class RoleUpdateResponse(BaseModel):
+    """For update role executor in task"""
+    msg: str
+
+
+class AddedUserInfo(BaseModel):
+    """Information about a user successfully added to the task ot team."""
+    id: int
+    email: str
+    first_name: str
+    last_name: str
+
+    class Config:
+        from_attributes = True
+
+
+class AddUsersResponse(BaseModel):
+    """Response schema for adding users to a task or team, including successes and errors."""
+    added: List[AddedUserInfo]
+    errors: List[str]
+
+
+class UsersRemoveRequest(BaseModel):
+    """Request schema for removing executors from a task by their user IDs."""
+    user_ids: List[int]
+
+
+class UsersRemoveResponse(BaseModel):
+    """Response schema after removing executors, listing removed and not found user IDs."""
+    removed: List[int]
+    not_found: List[int]
+
+    class Config:
+        from_attributes = True

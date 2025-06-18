@@ -1,11 +1,13 @@
 from typing import List
 from backend.src.models import User, TeamUserAssociation, TeamRole
+from backend.src.schemas.task_user import AddUsersResponse, UsersRemoveResponse
 from backend.src.schemas.user import UserRead
 from backend.src.services.basecrud import BaseCRUD
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from backend.src.schemas.team_user import TeamUserAssociationRead, TeamUserAdd
+from backend.src.schemas.team_user import TeamUserAssociationRead, TeamUserAdd, AddedUserInfo
 from sqlalchemy import select, delete, update
+from sqlalchemy.orm import aliased
 
 
 class TeamUserCRUD(BaseCRUD):
@@ -14,44 +16,61 @@ class TeamUserCRUD(BaseCRUD):
     def __init__(self):
         super().__init__(TeamUserAssociation, TeamUserAssociationRead)
 
-    async def add_users_bulk(
-            self,
-            db: AsyncSession,
-            team_id: int,
-            users: List[TeamUserAdd],
-    ) -> dict:
+    async def add_users(self, db: AsyncSession, team_id: int, users: List[TeamUserAdd]) -> AddUsersResponse:
         """Add multiple users to a team with roles."""
-        added_emails = []
+        if not users:
+            raise HTTPException(status_code=400, detail="No users provided for addition")
+
+        user_ids = [u.user_id for u in users]
         errors = []
+        added = []
 
-        emails = [user.email for user in users]
+        U = aliased(User)
+        TUA = aliased(TeamUserAssociation)
 
-        stmt = select(User.id, User.email).where(User.email.in_(emails))
+        stmt = (
+            select(U.id, U.email, U.first_name, U.last_name, TUA.user_id.label("assoc_user_id"))
+            .outerjoin(TUA, (TUA.user_id == U.id) & (TUA.team_id == team_id))
+            .where(U.id.in_(user_ids)))
         result = await db.execute(stmt)
-        existing_users = {email: user_id for user_id, email in result.all()}
+        rows = result.all()
 
-        stmt = select(TeamUserAssociation.user_id).where(
-            TeamUserAssociation.team_id == team_id,
-            TeamUserAssociation.user_id.in_(existing_users.values()))
-        result = await db.execute(stmt)
-        existing_assocs = {row[0] for row in result.all()}
+        user_data_map = {}
+        for user_id, email, first_name, last_name, assoc_user_id in rows:
+            user_data_map[user_id] = {
+                "email": email,
+                "first_name": first_name,
+                "last_name": last_name,
+                "in_team": assoc_user_id is not None
+            }
 
-        for user_data in users:
-            user_id = existing_users.get(user_data.email)
-            if user_id is None:
-                errors.append(f"User with email {user_data.email} not found")
+        new_assocs = []
+
+        for user in users:
+            data = user_data_map.get(user.user_id)
+            if data is None:
+                errors.append(f"User with id {user.user_id} not found")
                 continue
-            if user_id in existing_assocs:
-                errors.append(f"User {user_data.email} is already a member of the team")
+            if data["in_team"]:
+                errors.append(f"User with id {user.user_id} is already a member of the team")
                 continue
 
-            new_assoc = TeamUserAssociation(
-                team_id=team_id,
-                user_id=user_id,
-                role=user_data.role or TeamRole.EXECUTOR
-            )
-            db.add(new_assoc)
-            added_emails.append(user_data.email)
+            new_assocs.append(
+                TeamUserAssociation(
+                    team_id=team_id,
+                    user_id=user.user_id,
+                    role=user.role))
+            added.append(
+                AddedUserInfo(
+                    id=user.user_id,
+                    email=data["email"],
+                    first_name=data["first_name"],
+                    last_name=data["last_name"]))
+
+        if not new_assocs:
+            raise HTTPException(status_code=400, detail="No new users to add or all users already members")
+
+        db.add_all(new_assocs)
 
         try:
             await db.commit()
@@ -59,17 +78,31 @@ class TeamUserCRUD(BaseCRUD):
             await db.rollback()
             raise HTTPException(status_code=500, detail=f"Database error: {e}")
 
-        return {"added": added_emails, "errors": errors}
+        return AddUsersResponse(added=added, errors=errors)
 
-    async def remove_user(self, db: AsyncSession, team_id: int, user_id: int) -> None:
-        """Remove a user from a team."""
-        stmt = delete(TeamUserAssociation).where(
-            TeamUserAssociation.team_id == team_id,
-            TeamUserAssociation.user_id == user_id)
+    async def remove_users(self, db: AsyncSession, team_id: int, user_ids: List[int]) -> UsersRemoveResponse:
+        """Remove multiple users from a team by their IDs."""
 
-        await db.execute(stmt)
+        if not user_ids:
+            raise HTTPException(status_code=400, detail="No user IDs provided for removal")
+
+        stmt = (
+            delete(TeamUserAssociation)
+            .where(
+                TeamUserAssociation.team_id == team_id,
+                TeamUserAssociation.user_id.in_(user_ids))
+            .returning(TeamUserAssociation.user_id))
+
+        result = await db.execute(stmt)
+        removed_user_ids = [user_id for (user_id,) in result.all()]
+
         await db.commit()
-        return None
+
+        not_found = list(set(user_ids) - set(removed_user_ids))
+
+        return UsersRemoveResponse(
+            removed=removed_user_ids,
+            not_found=not_found)
 
     async def update_user_role(self, db: AsyncSession, team_id: int, user_id: int, role: TeamRole) -> dict:
         """Update a user's role inside a team. Raise if not found."""

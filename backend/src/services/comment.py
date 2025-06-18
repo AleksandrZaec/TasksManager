@@ -21,7 +21,11 @@ class CommentCRUD(BaseCRUD):
 
         comment = Comment(**data)
         db.add(comment)
-        await db.commit()
+        try:
+            await db.commit()
+        except Exception as e:
+            await db.rollback()
+            raise HTTPException(status_code=500, detail=f"Database error: {e}")
 
         result = await db.execute(
             select(Comment)
@@ -55,7 +59,11 @@ class CommentCRUD(BaseCRUD):
 
         comment.content = comment_in.content
 
-        await db.commit()
+        try:
+            await db.commit()
+        except Exception as e:
+            await db.rollback()
+            raise HTTPException(status_code=500, detail=f"Database error: {e}")
 
         return CommentRead.model_validate(comment)
 

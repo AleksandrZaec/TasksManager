@@ -22,8 +22,12 @@ class TaskCRUD(BaseCRUD):
 
         task = Task(**data)
         db.add(task)
-        await db.commit()
-        await db.refresh(task)
+        try:
+            await db.commit()
+            await db.refresh(task)
+        except Exception as e:
+            await db.rollback()
+            raise HTTPException(status_code=500, detail=f"Database error: {e}")
 
         return TaskShortRead.model_validate(task)
 
@@ -40,8 +44,12 @@ class TaskCRUD(BaseCRUD):
         for field, value in task_data.items():
             setattr(task, field, value)
 
-        await db.commit()
-        await db.refresh(task)
+        try:
+            await db.commit()
+            await db.refresh(task)
+        except Exception as e:
+            await db.rollback()
+            raise HTTPException(status_code=500, detail=f"Database error: {e}")
 
         return TaskShortRead.model_validate(task)
 
@@ -66,7 +74,10 @@ class TaskCRUD(BaseCRUD):
 
         assignees: list[AssigneeInfo] = [
             AssigneeInfo.model_validate({
+                "id": assoc.user.id,
                 "email": assoc.user.email,
+                "first_name": assoc.user.first_name,
+                "last_name": assoc.user.last_name,
                 "assigned_at": assoc.assigned_at,
                 "role": assoc.role
             })
@@ -80,7 +91,7 @@ class TaskCRUD(BaseCRUD):
             "status": task.status,
             "priority": task.priority,
             "due_date": task.due_date,
-            "creator_email": task.creator.email if task.creator else None,
+            "creator_email": task.creator.email,
             "team_id": task.team_id,
             "created_at": task.created_at,
             "updated_at": task.updated_at,
@@ -112,8 +123,12 @@ class TaskCRUD(BaseCRUD):
         )
         db.add(history)
 
-        await db.commit()
-        await db.refresh(task)
+        try:
+            await db.commit()
+            await db.refresh(task)
+        except Exception as e:
+            await db.rollback()
+            raise HTTPException(status_code=500, detail=f"Database error: {e}")
 
         return TaskShortRead.model_validate(task)
 

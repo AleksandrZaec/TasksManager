@@ -29,8 +29,12 @@ class BaseCRUD:
         """Create a new object."""
         obj = self.model(**obj_in.model_dump())
         db.add(obj)
-        await db.commit()
-        await db.refresh(obj)
+        try:
+            await db.commit()
+            await db.refresh(obj)
+        except Exception as e:
+            await db.rollback()
+            raise HTTPException(status_code=500, detail=f"Database error: {e}")
         return self.read_schema.model_validate(obj)
 
     async def update(self, db: AsyncSession, obj_id: int, obj_in: BaseModel) -> BaseModel:
@@ -44,8 +48,13 @@ class BaseCRUD:
         for field, value in obj_data.items():
             setattr(obj, field, value)
 
-        await db.commit()
-        await db.refresh(obj)
+        try:
+            await db.commit()
+            await db.refresh(obj)
+        except Exception as e:
+            await db.rollback()
+            raise HTTPException(status_code=500, detail=f"Database error: {e}")
+
         return self.read_schema.model_validate(obj)
 
     async def delete(self, db: AsyncSession, obj_id: int) -> dict:
@@ -55,7 +64,12 @@ class BaseCRUD:
         if not obj:
             raise HTTPException(status_code=404, detail="Object not found")
 
-        await db.delete(obj)
-        await db.commit()
+        try:
+            await db.delete(obj)
+            await db.commit()
+        except Exception as e:
+            await db.rollback()
+            raise HTTPException(status_code=500, detail=f"Database error: {e}")
+
         return {"message": f"{self.model.__name__} deleted successfully", "id": obj_id}
 

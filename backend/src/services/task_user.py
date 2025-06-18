@@ -3,87 +3,141 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, delete, update
 from fastapi import HTTPException, status
 from backend.src.models import TaskAssigneeAssociation, User
-from backend.src.schemas.task_user import TaskAssigneeRead, TaskUserAdd
+from backend.src.schemas.task_user import TaskUserAdd, AddUsersResponse, AddedUserInfo, \
+    UsersRemoveResponse, RoleUpdatePayload, RoleUpdateResponse
 from backend.src.services.basecrud import BaseCRUD
+from sqlalchemy.orm import aliased
 
 
 class TaskAssigneeCRUD(BaseCRUD):
     """CRUD operations for TaskAssigneeAssociation model."""
 
     def __init__(self):
-        super().__init__(TaskAssigneeAssociation, TaskAssigneeRead)
+        super().__init__(TaskAssigneeAssociation, AddUsersResponse)
 
-    async def add_executors(self, db: AsyncSession, task_id: int, obj_in: List[TaskUserAdd]) -> dict:
-        """Add users as executors to a task by their emails with optional roles."""
-        emails = [user.email for user in obj_in]
+    async def add_executors(self, db: AsyncSession, task_id: int, obj_in: List[TaskUserAdd]) -> AddUsersResponse:
+        """Add users as executors to a task by their IDs with optional roles."""
+        if not obj_in:
+            raise HTTPException(status_code=400, detail="No users provided to add")
 
-        stmt = select(User.id, User.email).where(User.email.in_(emails))
+        user_ids = [assignee.user_id for assignee in obj_in]
+        errors = []
+        added = []
+
+        U = aliased(User)
+        TAA = aliased(TaskAssigneeAssociation)
+
+        stmt = (
+            select(U.id, U.email, U.first_name, U.last_name, TAA.user_id.label("assoc_user_id"))
+            .outerjoin(TAA, (TAA.user_id == U.id) & (TAA.task_id == task_id))
+            .where(U.id.in_(user_ids)))
+
         result = await db.execute(stmt)
-        user_map = {email: user_id for user_id, email in result.all()}
+        rows = result.all()
 
-        stmt = select(TaskAssigneeAssociation.user_id).where(TaskAssigneeAssociation.task_id == task_id)
-        result = await db.execute(stmt)
-        existing_user_ids = set(result.scalars().all())
+        user_data_map = {
+            user_id: {
+                "email": email,
+                "first_name": first_name,
+                "last_name": last_name,
+                "assigned": assoc_user_id is not None
+            }
+            for user_id, email, first_name, last_name, assoc_user_id in rows
+        }
 
         new_assocs = []
-        added_emails = []
-        errors = []
 
         for assignee in obj_in:
-            user_id = user_map.get(assignee.email)
-            if not user_id:
-                errors.append(f"User with email {assignee.email} not found")
+            data = user_data_map.get(assignee.user_id)
+            if data is None:
+                errors.append(f"User with id {assignee.user_id} not found")
                 continue
-            if user_id in existing_user_ids:
-                errors.append(f"User {assignee.email} is already assigned to the task")
+            if data["assigned"]:
+                errors.append(f"User with id {assignee.user_id} is already assigned to the task")
                 continue
 
-            assoc = TaskAssigneeAssociation(
-                task_id=task_id,
-                user_id=user_id,
-                role=assignee.role or "executor"
-            )
-            new_assocs.append(assoc)
-            added_emails.append(assignee.email)
+            new_assocs.append(
+                TaskAssigneeAssociation(
+                    task_id=task_id,
+                    user_id=assignee.user_id,
+                    role=assignee.role or "executor"))
+            added.append(
+                AddedUserInfo(
+                    id=assignee.user_id,
+                    email=data["email"],
+                    first_name=data["first_name"],
+                    last_name=data["last_name"]))
 
         if not new_assocs:
             raise HTTPException(status_code=400, detail="No new users to add or all users already assigned")
 
         db.add_all(new_assocs)
-        await db.commit()
 
-        return {"added": added_emails, "errors": errors}
+        try:
+            await db.commit()
+        except Exception as e:
+            await db.rollback()
+            raise HTTPException(status_code=500, detail=f"Database error: {e}")
 
-    async def remove_executor(self, db: AsyncSession, task_id: int, user_id: int) -> None:
-        """Remove a user as an executor from a task."""
-        stmt = delete(TaskAssigneeAssociation).where(
-            TaskAssigneeAssociation.task_id == task_id,
-            TaskAssigneeAssociation.user_id == user_id)
+        return AddUsersResponse(added=added, errors=errors)
 
-        await db.execute(stmt)
-        await db.commit()
-        return None
+    async def remove_executors(self, db: AsyncSession, task_id: int, user_ids: List[int]) -> UsersRemoveResponse:
+        """Remove multiple users as executors from a task by their IDs."""
+        if not user_ids:
+            raise HTTPException(status_code=400, detail="No user IDs provided for removal")
 
-    async def update_executor_role(self, db: AsyncSession, task_id: int, user_id: int, new_role: str) -> dict:
-        """Update the role of an executor in a task."""
+        stmt = (
+            delete(TaskAssigneeAssociation)
+            .where(
+                TaskAssigneeAssociation.task_id == task_id,
+                TaskAssigneeAssociation.user_id.in_(user_ids))
+            .returning(TaskAssigneeAssociation.user_id))
+
+        result = await db.execute(stmt)
+        deleted_user_ids = [user_id for (user_id,) in result.all()]
+
+        try:
+            await db.commit()
+        except Exception as e:
+            await db.rollback()
+            raise HTTPException(status_code=500, detail=f"Database error: {e}")
+
+        not_found = sorted(set(user_ids) - set(deleted_user_ids))
+
+        return UsersRemoveResponse(
+            removed=deleted_user_ids,
+            not_found=not_found)
+
+    async def update_executor_role(
+            self, db: AsyncSession,
+            task_id: int, user_id: int,
+            payload: RoleUpdatePayload
+    ) -> RoleUpdateResponse:
+        """Update the role of an executor assigned to a task."""
         stmt = (
             update(TaskAssigneeAssociation)
             .where(
                 TaskAssigneeAssociation.task_id == task_id,
-                TaskAssigneeAssociation.user_id == user_id,
-            )
-            .values(role=new_role)
+                TaskAssigneeAssociation.user_id == user_id, )
+            .values(role=payload.new_role)
             .execution_options(synchronize_session="fetch"))
 
         result = await db.execute(stmt)
-        await db.commit()
 
         if result.rowcount == 0:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Executor not found for this task")
 
-        return {"msg": "Role updated"}
+        try:
+            await db.commit()
+        except Exception as e:
+            await db.rollback()
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Database error: {e}")
+
+        return RoleUpdateResponse(msg="Role updated")
 
 
 task_user_crud = TaskAssigneeCRUD()
