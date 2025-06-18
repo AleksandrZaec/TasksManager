@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime, timedelta, timezone
-from backend.src.models import TeamUserAssociation
+from backend.src.models import TeamUserAssociation, TeamRole, User
 from backend.src.models.team import Team
 from backend.src.schemas.task import TaskRead
 from backend.src.schemas.team import TeamCreate, TeamRead, TeamWithUsersAndTask, TeamUpdate
@@ -11,7 +11,6 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from fastapi import HTTPException, status
 from sqlalchemy.orm import selectinload
-from backend.src.services.team_user import team_users_crud
 
 
 class TeamCRUD(BaseCRUD):
@@ -26,7 +25,7 @@ class TeamCRUD(BaseCRUD):
         unique_digits = str(uuid.uuid4().int)[:4]
         return f"{clean_name}-{unique_digits}"
 
-    async def create_team(self, db: AsyncSession, team_in: TeamCreate) -> TeamRead:
+    async def create_team(self, db: AsyncSession, team_in: TeamCreate, creator_id: int) -> TeamRead:
         """Create a new Team with optional users in one transaction."""
         result = await db.execute(select(Team).where(Team.name == team_in.name.strip()))
         existing_team = result.scalar_one_or_none()
@@ -43,6 +42,23 @@ class TeamCRUD(BaseCRUD):
 
         users = team_in.users or []
 
+        user_ids = {user.user_id for user in users}
+        if user_ids:
+            result = await db.execute(select(User.id).where(User.id.in_(user_ids)))
+            existing_user_ids = set(result.scalars().all())
+
+            missing_users = user_ids - existing_user_ids
+            if missing_users:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"Users not found: {missing_users}")
+
+        user_roles = {
+            user.user_id: user.role if user.role else TeamRole.EXECUTOR.value
+            for user in users}
+
+        user_roles[creator_id] = TeamRole.MANAGER.value
+
         max_attempts = 5
         for attempt in range(max_attempts):
             team_data["invite_code"] = self._generate_invite_code(team_data["name"])
@@ -52,11 +68,11 @@ class TeamCRUD(BaseCRUD):
             try:
                 await db.flush()
 
-                for user_in in users:
+                for user_id, role in user_roles.items():
                     association = TeamUserAssociation(
                         team_id=team.id,
-                        user_id=user_in.user_id,
-                        role=user_in.role)
+                        user_id=user_id,
+                        role=role)
                     db.add(association)
 
                 await db.commit()
