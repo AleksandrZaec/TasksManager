@@ -1,8 +1,8 @@
 from typing import Optional, List
 from datetime import datetime
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 from backend.src.models.enum import TaskStatus, TaskPriority
-from backend.src.schemas.task_user import AssigneeInfo
+from backend.src.schemas.task_user import AssigneeInfo, TaskUserAdd
 
 
 class TaskBase(BaseModel):
@@ -12,7 +12,7 @@ class TaskBase(BaseModel):
     status: TaskStatus = TaskStatus.OPEN
     priority: TaskPriority = TaskPriority.MEDIUM
     due_date: Optional[datetime] = None
-    team_id: int
+
 
     class Config:
         from_attributes = True
@@ -20,7 +20,17 @@ class TaskBase(BaseModel):
 
 class TaskCreate(TaskBase):
     """Schema for creating a new task."""
-    pass
+    assignees: Optional[List[TaskUserAdd]] = None
+
+    @field_validator("assignees")
+    @classmethod
+    def check_unique_user_ids(cls, assignees):
+        if assignees is None:
+            return assignees
+        user_ids = [a.user_id for a in assignees]
+        if len(user_ids) != len(set(user_ids)):
+            raise ValueError("Duplicate user_id in assignees")
+        return assignees
 
 
 class TaskUpdate(BaseModel):
@@ -48,6 +58,7 @@ class TaskShortRead(BaseModel):
 class TaskRead(TaskBase):
     """Detailed schema for a task, includes assignees with role and assigned time."""
     id: int
+    team_id: int
     creator_email: str
     created_at: datetime
     updated_at: Optional[datetime] = None
@@ -67,4 +78,3 @@ class TaskFilter(BaseModel):
     statuses: Optional[List[TaskStatus]] = None
     priorities: Optional[List[TaskPriority]] = None
     team_id: Optional[int] = None
-
