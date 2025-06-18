@@ -9,7 +9,7 @@ type TaskTableProps = {
   data: Record<string, TaskType[]>;
 };
 export const TaskList = ({ data }: TaskTableProps) => {
-  const statuss = [
+  const allStatus = [
     { status: 'Ожидает', icon: '/icons/pending.svg', className: 'pending' },
     { status: 'В процессе', icon: '/icons/in-progress.svg', className: 'inProgress' },
     { status: 'Готово', icon: '/icons/done.svg', className: 'done' },
@@ -24,7 +24,7 @@ export const TaskList = ({ data }: TaskTableProps) => {
   ];
   return (
     <div className={s.tasks}>
-      {statuss.map((statusList) => (
+      {allStatus.map((statusList) => (
         <Block key={statusList.status}>
           <div className={s.list}>
             <div className={`${s.statusIcons} ${s[statusList.className]}`}>
@@ -32,8 +32,8 @@ export const TaskList = ({ data }: TaskTableProps) => {
               <p>{statusList.status}</p>
             </div>
             <div className={s.title}>
-              {column.map((columnList) => (
-                <p>{columnList}</p>
+              {column.map((columnList, index) => (
+                <p key={index}>{columnList}</p>
               ))}
             </div>
             <Scroll extraClass={s.scroll}>
@@ -44,7 +44,11 @@ export const TaskList = ({ data }: TaskTableProps) => {
               ))}
             </Scroll>
           </div>
-          <Button type={'text'} icon={true} extraClass={s.button}>Добавить задачу</Button>
+          {statusList.status === 'Ожидает' && (
+            <Button type={'text'} icon={true} extraClass={s.button}>
+              Добавить задачу
+            </Button>
+          )}
         </Block>
       ))}
     </div>

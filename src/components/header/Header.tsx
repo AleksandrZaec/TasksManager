@@ -1,17 +1,31 @@
 import { Block } from '../../items/block/Block';
 import { Button } from '../../items/button/Button';
+import { Dropdown } from '../../items/dropdown/Dropdown';
 import s from './Header.module.scss';
 
 type HeaderProps = {
   children: React.ReactNode;
+  selectedTeam: string;
+  setSelectedTeam: (nameTeam: string) => void;
 };
-export const Header = ({ children }: HeaderProps) => {
+export const Header = ({ children, setSelectedTeam, selectedTeam }: HeaderProps) => {
+  const listTeams = [
+    { name: 'Team1' },
+    { name: 'Team2pppppppppppppppppppppppppppppppppppp' },
+    { name: 'Team3pppppppppppppppppppppppppppppppppppp' },
+  ];
   return (
     <div className={s.container}>
       <div className={s.menu}>
         <Block extraClass={s.header}>
-          <Button type={'outline'} icon={true} extraClass={s.button}>Добавить команду</Button>
-          <p>Список команд</p>
+          <Button type={'outline'} icon={true} extraClass={s.button}>
+            Добавить команду
+          </Button>
+          <Dropdown
+            title={'Список команд'}
+            data={listTeams}
+            selectedTeam={selectedTeam}
+            setSelectedTeam={setSelectedTeam}></Dropdown>
           <p>Календарь</p>
           <p>Встречи</p>
           <p>Профиль</p>
