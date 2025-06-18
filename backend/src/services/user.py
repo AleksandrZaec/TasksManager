@@ -12,6 +12,7 @@ from sqlalchemy.orm import selectinload
 
 class UserCRUD(BaseCRUD):
     """CRUD operations for User model."""
+
     def __init__(self):
         super().__init__(User, UserRead)
 
@@ -31,7 +32,11 @@ class UserCRUD(BaseCRUD):
         user = User(**user_data, password=password)
 
         db.add(user)
-        await db.commit()
+        try:
+            await db.commit()
+        except Exception as e:
+            await db.rollback()
+            raise HTTPException(status_code=500, detail=f"Database error: {e}")
         await db.refresh(user)
         return UserRead.model_validate(user)
 
@@ -59,7 +64,12 @@ class UserCRUD(BaseCRUD):
         for field, value in update_data.items():
             setattr(user, field, value)
 
-        await db.commit()
+        try:
+            await db.commit()
+        except Exception as e:
+            await db.rollback()
+            raise HTTPException(status_code=500, detail=f"Database error: {e}")
+
         await db.refresh(user)
         return UserRead.model_validate(user)
 
@@ -124,9 +134,13 @@ class UserCRUD(BaseCRUD):
             raise HTTPException(status_code=404, detail="User not found")
 
         user.role = role
-        await db.commit()
-        await db.refresh(user)
+        try:
+            await db.commit()
+        except Exception as e:
+            await db.rollback()
+            raise HTTPException(status_code=500, detail=f"Database error: {e}")
 
+        await db.refresh(user)
         return UserRead.model_validate(user)
 
 

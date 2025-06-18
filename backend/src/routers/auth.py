@@ -11,8 +11,7 @@ router = APIRouter()
 
 
 @router.post("/login")
-async def login(
-        data: LoginRequest, db: AsyncSession = Depends(get_db)) -> dict[str, str]:
+async def login(data: LoginRequest, db: AsyncSession = Depends(get_db)) -> dict[str, str]:
     """Authenticate user and return a JWT access token."""
     user_data = await UserCRUD.get_for_login(db, data.email)
     if not user_data or not verify_password(data.password, user_data["password"]):
@@ -46,9 +45,7 @@ async def login(
 
 
 @router.post("/refresh")
-async def refresh_token(
-        refresh_token: str = Body(..., embed=True),
-) -> dict[str, str]:
+async def refresh_token(refresh_token: str = Body(..., embed=True)) -> dict[str, str]:
     """Issue new access token using refresh token."""
     try:
         token_data = await decode_refresh_token(refresh_token)
