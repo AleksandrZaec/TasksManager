@@ -30,7 +30,7 @@ export const mockData = [
     id: 4,
     name: 'Настроить окружение',
     date: '25.06.2025',
-    executor: 'Иванов',
+    executor: 'Иванова',
     status: 'В процессе',
     manager: 'Петрова',
     priority: 'Низкий',
@@ -39,7 +39,7 @@ export const mockData = [
     id: 5,
     name: 'Настроить окружение',
     date: '25.06.2025',
-    executor: 'Иванов',
+    executor: 'Иванова',
     status: 'В процессе',
     manager: 'Петрова',
     priority: 'Низкий',
@@ -48,7 +48,7 @@ export const mockData = [
     id: 6,
     name: 'Настроить окружение',
     date: '25.06.2025',
-    executor: 'Иванов',
+    executor: 'Иванова',
     status: 'В процессе',
     manager: 'Петрова',
     priority: 'Низкий',
@@ -139,4 +139,6 @@ export const column = [
   'Приоритет',
 ];
 
-export const profileList = ['Профиль', 'Выйти'];
+export const columnUser = ['Имя задачи', 'Срок сдачи', 'Ответственный', 'Приоритет'];
+
+export const titles = ['Все', 'Ожидает', 'В процессе', 'Готово'];

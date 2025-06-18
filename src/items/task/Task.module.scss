@@ -14,3 +14,6 @@
     border-radius: 8px;
   }
 }
+.currentName {
+  grid-template-columns: 2fr repeat(3, 1fr);
+}

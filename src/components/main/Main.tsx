@@ -29,9 +29,7 @@ export const Main = () => {
         <div className={s.main}>
           <p className={s.subTitle}>Список задач</p>
         </div>
-        <div>
-          <TaskList data={statusTask} />
-        </div>
+        <TaskList data={statusTask} />
       </div>
     </Header>
   );

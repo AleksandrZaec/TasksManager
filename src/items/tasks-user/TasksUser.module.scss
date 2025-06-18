@@ -1,0 +1,46 @@
+@use '../../styles/styles.scss' as *;
+
+.tasks {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.list {
+  margin-bottom: 14px;
+}
+.subTitle {
+  display: grid;
+  grid-template-columns: 2fr repeat(3, 1fr);
+  height: 40px;
+  font-size: 16px;
+  font-weight: 700;
+  border-bottom: 1px solid #ffe3a5;
+  padding-right: 20px;
+  width: calc(100% - 10px);
+  p:nth-child(1) {
+    padding-left: 5px;
+  }
+}
+.scroll {
+  max-height: 700px;
+}
+.blockTasks {
+    border-top-left-radius: 0;
+}
+.allTitle {
+  display: flex;
+}
+.title {
+  cursor: pointer;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  padding: 10px;
+  &:focus,
+  &:hover {
+    background-color: #ffffff;
+  }
+}
+.active {
+  background-color: #ffffff;
+  font-weight: bold;
+}

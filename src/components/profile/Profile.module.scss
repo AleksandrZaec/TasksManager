@@ -1,0 +1,13 @@
+@use '../../styles/styles.scss' as *;
+
+.container {
+  display: flex;
+  gap: 30px;
+}
+.blockData {
+  width: 400px;
+  height: 100%;
+}
+.blockTasks {
+  width: 100%;
+}

@@ -3,7 +3,7 @@ import { ROUTES } from './Routes';
 import { LoginPage } from '../pages/loginPage/LoginPage';
 import { RegisterPage } from '../pages/registerPage/RegisterPage';
 import { MainPage } from '../pages/mainPage/MainPage';
-import { ProfilePage } from '../pages/ProfilePage';
+import { ProfilePage } from '../pages/profilePage/ProfilePage';
 import { NotFoundPage } from '../pages/NotFoundPage';
 import { BackgroundImageLayout } from '../components/layouts/BackgroundImageLayout';
 
