@@ -8,7 +8,6 @@ from backend.src.schemas.task import TaskRead, TaskShortRead, TaskCreate, TaskUp
 from backend.src.schemas.task_user import AssigneeInfo
 from backend.src.services.basecrud import BaseCRUD
 from sqlalchemy.orm import selectinload
-from backend.src.services.task_user import task_user_crud
 
 
 class TaskCRUD(BaseCRUD):
@@ -23,18 +22,29 @@ class TaskCRUD(BaseCRUD):
 
         task = Task(**data)
         db.add(task)
+        await db.flush()
+
+        if task_in.assignees:
+            user_ids = [a.user_id for a in task_in.assignees]
+            result = await db.execute(select(User).where(User.id.in_(user_ids)))
+            users = {user.id: user for user in result.scalars().all()}
+
+            if len(users) != len(user_ids):
+                raise HTTPException(status_code=400, detail="Some assignees not found")
+
+            for assignee in task_in.assignees:
+                association = TaskAssigneeAssociation(
+                    task_id=task.id,
+                    user_id=assignee.user_id,
+                    role=assignee.role)
+                db.add(association)
+
         try:
             await db.commit()
             await db.refresh(task)
         except Exception as e:
             await db.rollback()
             raise HTTPException(status_code=500, detail=f"Database error: {e}")
-
-        if task_in.assignees:
-            try:
-                await task_user_crud.add_executors(db, task.id, task_in.assignees)
-            except Exception as e:
-                raise HTTPException(status_code=500, detail=f"Failed to assign users: {e}")
 
         return TaskShortRead.model_validate(task)
 

@@ -27,7 +27,7 @@ class TeamCRUD(BaseCRUD):
         return f"{clean_name}-{unique_digits}"
 
     async def create_team(self, db: AsyncSession, team_in: TeamCreate) -> TeamRead:
-        """Create a new Team"""
+        """Create a new Team with optional users in one transaction."""
         result = await db.execute(select(Team).where(Team.name == team_in.name.strip()))
         existing_team = result.scalar_one_or_none()
         if existing_team:
@@ -38,26 +38,29 @@ class TeamCRUD(BaseCRUD):
         team_data = team_in.model_dump(exclude={"users"})
         team_data["name"] = team_data["name"].strip()
 
-        users = team_in.users
-
         if team_data.get("invite_code_expires_at") is None:
             team_data["invite_code_expires_at"] = datetime.now(timezone.utc) + timedelta(days=7)
+
+        users = team_in.users or []
 
         max_attempts = 5
         for attempt in range(max_attempts):
             team_data["invite_code"] = self._generate_invite_code(team_data["name"])
             team = Team(**team_data)
-
             db.add(team)
+
             try:
+                await db.flush()
+
+                for user_in in users:
+                    association = TeamUserAssociation(
+                        team_id=team.id,
+                        user_id=user_in.user_id,
+                        role=user_in.role)
+                    db.add(association)
+
                 await db.commit()
                 await db.refresh(team)
-
-                if users:
-                    try:
-                        await team_users_crud.add_users(db, team.id, users)
-                    except Exception as e:
-                        raise HTTPException(status_code=500, detail=f"Failed to add users to team: {e}")
 
                 return TeamRead.model_validate(team)
 
@@ -69,7 +72,6 @@ class TeamCRUD(BaseCRUD):
                     raise HTTPException(
                         status_code=status.HTTP_400_BAD_REQUEST,
                         detail="Team with this name already exists")
-
                 elif "teams_invite_code_key" in err_msg or (
                         "unique constraint" in err_msg and "invite_code" in err_msg):
                     if attempt == max_attempts - 1:
