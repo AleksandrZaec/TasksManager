@@ -6,5 +6,12 @@
 .block {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   z-index: 10;
-  max-width: 170px;
+  position: absolute;
+  width: 300px;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 5px;
+}
+.profile {
+  width: 150px;
 }

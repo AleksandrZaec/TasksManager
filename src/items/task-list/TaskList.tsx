@@ -1,4 +1,4 @@
-import { TaskType } from '../../components/main/mockData';
+import { allStatus, column, TaskType } from '../../mockData';
 import { Block } from '../block/Block';
 import { Button } from '../button/Button';
 import { Scroll } from '../scroll/Scroll';
@@ -9,19 +9,6 @@ type TaskTableProps = {
   data: Record<string, TaskType[]>;
 };
 export const TaskList = ({ data }: TaskTableProps) => {
-  const allStatus = [
-    { status: 'Ожидает', icon: '/icons/pending.svg', className: 'pending' },
-    { status: 'В процессе', icon: '/icons/in-progress.svg', className: 'inProgress' },
-    { status: 'Готово', icon: '/icons/done.svg', className: 'done' },
-  ];
-  const column = [
-    'Имя задачи',
-    'Номер задачи',
-    'Срок сдачи',
-    'Ответственный',
-    'Задачу создал',
-    'Приоритет',
-  ];
   return (
     <div className={s.tasks}>
       {allStatus.map((statusList) => (

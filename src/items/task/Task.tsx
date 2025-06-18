@@ -1,4 +1,4 @@
-import { TaskType } from '../../components/main/mockData';
+import { TaskType } from '../../mockData';
 import s from './Task.module.scss';
 
 type TaskProps = {

@@ -118,3 +118,25 @@ export type TaskType = {
   manager: string;
   priority: string;
 };
+
+export const listTeams = [
+  { name: 'Team1' },
+  { name: 'Team2ppppppppppppppppppppppppppppppppppppppppppppp' },
+  { name: 'Team3pppppppppppppppppppppppppppppppppppp' },
+];
+
+export const allStatus = [
+  { status: 'Ожидает', icon: '/icons/pending.svg', className: 'pending' },
+  { status: 'В процессе', icon: '/icons/in-progress.svg', className: 'inProgress' },
+  { status: 'Готово', icon: '/icons/done.svg', className: 'done' },
+];
+export const column = [
+  'Имя задачи',
+  'Номер задачи',
+  'Срок сдачи',
+  'Ответственный',
+  'Задачу создал',
+  'Приоритет',
+];
+
+export const profileList = ['Профиль', 'Выйти'];

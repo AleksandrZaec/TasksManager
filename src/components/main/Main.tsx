@@ -3,7 +3,7 @@ import { Button } from '../../items/button/Button';
 import { TaskList } from '../../items/task-list/TaskList';
 import { Header } from '../header/Header';
 import s from './Main.module.scss';
-import { mockData, TaskType } from './mockData';
+import { mockData, TaskType } from '../../mockData';
 
 export const Main = () => {
   const [selectedTeam, setSelectedTeam] = useState<string>('Team1');
@@ -15,14 +15,19 @@ export const Main = () => {
     <Header setSelectedTeam={setSelectedTeam} selectedTeam={selectedTeam}>
       <div className={s.content}>
         <div className={s.main}>
-          <h1 className={s.title}>{selectedTeam}</h1>
-          <p>Участников: 10</p>
-          <Button type={'outline'} extraClass={s.button} icon={true}>
-            Добавить участников
-          </Button>
+          <div className={s.blockWithIcon}>
+            <h1 className={s.title}>{selectedTeam}</h1>
+            <img src='/icons/reName.png' alt='rename' className={s.icon} />
+          </div>
+          <div className={s.blockWithButton}>
+            <p className={s.subTitle}>Участников: 10</p>
+            <Button type={'outline'} extraClass={s.button} icon={true}>
+              Добавить участников
+            </Button>
+          </div>
         </div>
         <div className={s.main}>
-          <p>Список задач</p>
+          <p className={s.subTitle}>Список задач</p>
         </div>
         <div>
           <TaskList data={statusTask} />

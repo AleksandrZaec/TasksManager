@@ -6,15 +6,38 @@
 .main {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 50px;
+  margin-inline: 15px;
+  margin-bottom: 5px;
 }
 .button {
   color: #ffae00;
   width: 250px;
 }
+.blockWithIcon {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
 .title {
-  width: 500px;
+  max-width: 500px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.icon {
+  width: 25px;
+  height: 25px;
+  cursor: pointer;
+}
+.blockWithButton {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.subTitle {
+  color: #575757;
+  font-size: 18px;
+  font-weight: 700;
 }
