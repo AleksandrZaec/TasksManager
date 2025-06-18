@@ -1,0 +1,18 @@
+@use '../../styles/styles.scss' as *;
+
+.title {
+  cursor: pointer;
+  padding: 10px;
+  max-height: 90px;
+  word-break: break-all;
+  &:not(:last-child) {
+    border-bottom: 1px solid #ffedc5;
+  }
+  &:hover {
+    background-color: #ffedc5;
+    border-radius: 8px;
+  }
+}
+.selected {
+  font-weight: 700;
+}

@@ -8,4 +8,9 @@
   border-bottom: 1px solid #ffe3a5;
   align-items: center;
   cursor: pointer;
+  padding: 5px;
+  &:hover {
+    background-color: #ffedc5;
+    border-radius: 8px;
+  }
 }
