@@ -13,4 +13,6 @@ export const validation = (passwordValue?: string) => ({
     required: 'Это поле обязательно',
     validate: (value: string) => value === passwordValue || 'Пароли не совпадают',
   },
+  first_name: { required: 'Имя обязательно' },
+  last_name: { required: 'Фамилия обязательна' },
 });

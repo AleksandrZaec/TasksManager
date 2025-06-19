@@ -9,13 +9,14 @@ interface FormFieldProps<TFieldValues extends FieldValues> {
   rules: RegisterOptions<TFieldValues, FieldPath<TFieldValues>>;
   label: string;
   placeholder: string;
-  type?: 'email' | 'password';
+  type?: 'email' | 'password' | 'text';
   error?: boolean;
   errorText?: string;
   defaultValue?: unknown;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  showTooltip: boolean;
+  showTooltip?: boolean;
   onBlur?: () => void;
+  extraClass?: string;
 }
 
 export const FormField = <TFieldValues extends FieldValues>({
@@ -28,8 +29,8 @@ export const FormField = <TFieldValues extends FieldValues>({
   error,
   errorText,
   onChange,
-  showTooltip,
   onBlur,
+  extraClass,
 }: FormFieldProps<TFieldValues>) => {
   return (
     <div>
@@ -41,6 +42,7 @@ export const FormField = <TFieldValues extends FieldValues>({
           <div className={s.container}>
             <Input
               {...field}
+              extraClass={extraClass}
               label={label}
               placeholder={placeholder}
               type={type}
@@ -54,7 +56,9 @@ export const FormField = <TFieldValues extends FieldValues>({
                 onBlur?.();
               }}
             />
-            {error && <Tooltip error={true} isVisible={!showTooltip} errorText={errorText} />}
+            {error && (
+              <Tooltip error={true} isVisible={true} errorText={errorText} />
+            )}
           </div>
         )}
       />

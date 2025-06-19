@@ -1,6 +1,7 @@
-import { Block } from '../../items/block/Block';
-import { Button } from '../../items/button/Button';
-import { Input } from '../../items/input/Input';
+import { EmailSetting } from '../../items/formSetting/email/EmailSetting';
+import { FirstNameSetting } from '../../items/formSetting/first-name/FirstNameSetting';
+import { LastNameSetting } from '../../items/formSetting/last-name/LastNameSetting';
+import { PasswordSetting } from '../../items/formSetting/password/PasswordSetting';
 import s from './Setting.module.scss';
 
 export const Setting = () => {
@@ -8,61 +9,10 @@ export const Setting = () => {
     <div>
       <p className={s.title}>Изменить личные данные</p>
       <div className={s.container}>
-        <Block extraClass={s.block}>
-          <form>
-            <Input
-              extraClass={s.input}
-              label={'Фамилия'}
-              placeholder='Иванов'
-              type={'text'}
-              onChange={() => {}}
-            />
-            <Button type={'outline'}>Сохранить</Button>
-          </form>
-        </Block>
-        <Block extraClass={s.block}>
-          <form>
-            <Input
-              extraClass={s.input}
-              label={'Имя'}
-              placeholder='Иван'
-              type={'text'}
-              onChange={() => {}}
-            />
-            <Button type={'outline'}>Сохранить</Button>
-          </form>
-        </Block>
-        <Block extraClass={s.block}>
-          <form>
-            <Input
-              extraClass={s.input}
-              label={'Пароль'}
-              placeholder='Введите пароль'
-              type={'password'}
-              onChange={() => {}}
-            />
-            <Input
-              extraClass={s.input}
-              label={'Повторите пароль'}
-              placeholder='Повторите пароль'
-              type={'password'}
-              onChange={() => {}}
-            />
-            <Button type={'outline'}>Сохранить</Button>
-          </form>
-        </Block>
-        <Block extraClass={s.block}>
-          <form>
-            <Input
-              extraClass={s.input}
-              label={'Почта'}
-              placeholder='Введите почту'
-              type={'email'}
-              onChange={() => {}}
-            />
-            <Button type={'outline'}>Сохранить</Button>
-          </form>
-        </Block>
+        <LastNameSetting />
+        <FirstNameSetting />
+        <PasswordSetting />
+        <EmailSetting />
       </div>
     </div>
   );

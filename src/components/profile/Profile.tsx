@@ -8,6 +8,7 @@ import { mockData } from '../../mockData';
 import { TasksUser } from '../../items/tasks-user/TasksUser';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { ROUTES } from '../../route/Routes';
+import { BackNavButton } from '../../items/back-nav-button/BackNavButton';
 
 export const Profile = () => {
   const [selectedTeam, setSelectedTeam] = useState<string>('Team1');
@@ -19,16 +20,25 @@ export const Profile = () => {
   };
   return (
     <Header setSelectedTeam={setSelectedTeam} selectedTeam={selectedTeam}>
+      <BackNavButton />
       <div className={s.container}>
         <div className={s.blockData}>
           <Block extraClass={s.blockUser}>
-            <h1 className={s.title}>{'Иванов Иван'}</h1>
-            <p>ID</p>
-            {selectedTeam && <p>Роль в {selectedTeam}</p>}
-            <p>Почта</p>
-            <Button type={'outline'} onClick={handleSetting}>
-              Редактировать
-            </Button>
+            <h1 className={s.title}>
+              {'Иванов Очень длинное слово которое может быть перенесено.'}
+            </h1>
+            <p className={s.subTitle}>ID</p>
+            {selectedTeam && <p className={s.subTitle}>Роль в {selectedTeam}</p>}
+            <p className={s.subTitle}>
+              {'ivanov1111111111111111111111111444444444444444444444111111@mail.ru'}
+            </p>
+            {location.pathname === '/profile' && (
+              <div className={s.button}>
+                <Button type={'outline'} onClick={handleSetting}>
+                  Редактировать
+                </Button>
+              </div>
+            )}
           </Block>
           <Block extraClass={s.blockStar}>
             <img src='/icons/star.webp' alt='star' className={s.icon} />
@@ -41,11 +51,11 @@ export const Profile = () => {
         {location.pathname === '/profile' && (
           <div className={s.blockTasks}>
             <h1 className={style.title}>{selectedTeam}</h1>
-            <p>Мои задачи</p>
+            <p className={s.tasks}>Мои задачи</p>
             <TasksUser data={currentExecutorr} currentName={currentName} />
           </div>
         )}
-        <Outlet/>
+        <Outlet />
       </div>
     </Header>
   );

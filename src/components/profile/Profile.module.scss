@@ -3,10 +3,14 @@
 .container {
   display: flex;
   gap: 30px;
+  justify-content: center;
 }
 .blockData {
-  width: 300px;
+  max-width: 300px;
   height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .blockTasks {
@@ -18,6 +22,9 @@
 }
 .blockUser {
   margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 .blockStar {
   border: 1px solid #ffc64b;
@@ -25,9 +32,25 @@
   justify-content: center;
   gap: 20px;
   align-items: center;
-  width: 100%;
+  width: 250px;
 }
 .star {
   display: flex;
   flex-direction: column;
+}
+.title {
+  font-size: 28px;
+  word-break: break-word;
+}
+.subTitle {
+  word-break: break-word;
+}
+
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.tasks {
+  margin-bottom: 10px;
 }
