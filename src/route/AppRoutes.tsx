@@ -6,6 +6,7 @@ import { MainPage } from '../pages/mainPage/MainPage';
 import { ProfilePage } from '../pages/profilePage/ProfilePage';
 import { NotFoundPage } from '../pages/NotFoundPage';
 import { BackgroundImageLayout } from '../components/layouts/BackgroundImageLayout';
+import { Setting } from '../components/setting/Setting';
 
 export const AppRoutes = () => {
   return (
@@ -13,7 +14,9 @@ export const AppRoutes = () => {
       <Route element={<BackgroundImageLayout />}>
         <Route path={ROUTES.LOGIN} element={<LoginPage />} />
         <Route path={ROUTES.REGISTER} element={<RegisterPage />} />
-        <Route path={ROUTES.PROFILE} element={<ProfilePage />} />
+        <Route path={ROUTES.PROFILE} element={<ProfilePage />}>
+          <Route path={ROUTES.SETTING} element={<Setting />} />
+        </Route>
         <Route path={ROUTES.NOT_FOUND} element={<NotFoundPage />} />
       </Route>
       <Route path={ROUTES.HOME} element={<MainPage />} />

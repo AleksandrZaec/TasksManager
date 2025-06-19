@@ -5,9 +5,29 @@
   gap: 30px;
 }
 .blockData {
-  width: 400px;
+  width: 300px;
   height: 100%;
 }
+
 .blockTasks {
   width: 100%;
+}
+.icon {
+  width: 30px;
+  height: 30px;
+}
+.blockUser {
+  margin-bottom: 10px;
+}
+.blockStar {
+  border: 1px solid #ffc64b;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  align-items: center;
+  width: 100%;
+}
+.star {
+  display: flex;
+  flex-direction: column;
 }

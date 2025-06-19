@@ -3,5 +3,6 @@ export const ROUTES = {
   LOGIN: '/',
   HOME: '/home',
   PROFILE: '/profile',
+  SETTING: 'setting',
   NOT_FOUND: '*',
 };
