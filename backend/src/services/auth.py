@@ -3,9 +3,8 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jose import jwt, JWTError
 from backend.src.config.settings import settings
 from fastapi import Depends, HTTPException, status
-
 from backend.src.models import TeamRole
-from backend.src.schemas.user import UserPayload, UserTeamInfo
+from backend.src.schemas import UserPayload, UserTeamInfo
 
 # oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 bearer_scheme = HTTPBearer()

@@ -23,7 +23,6 @@ class TaskCreate(TaskBase):
     assignees: Optional[List[TaskUserAdd]] = None
 
     @field_validator("assignees")
-    @classmethod
     def check_unique_user_ids(cls, assignees):
         if assignees is None:
             return assignees

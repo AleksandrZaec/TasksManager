@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from backend.src.config.db import get_db
 from backend.src.services.user import users_crud
 from backend.src.models import UserRole
-from backend.src.schemas.user import UserCreate, UserRead, UserUpdate, UserReadWithTeams
+from backend.src.schemas import UserCreate, UserRead, UserUpdate, UserReadWithTeams
 
 router = APIRouter()
 
@@ -44,3 +44,9 @@ async def delete_user(user_id: int, db: AsyncSession = Depends(get_db)) -> None:
 async def set_user_role(user_id: int, role: UserRole, db: AsyncSession = Depends(get_db)) -> UserRead:
     """Set global role for a user (admin only)."""
     return await users_crud.set_global_role(db, user_id, role)
+
+
+@router.get("/teams/{team_id}/users", response_model=List[UserRead])
+async def get_team_users(team_id: int, db: AsyncSession = Depends(get_db)) -> List[UserRead]:
+    """Get all users who are members of the team."""
+    return await users_crud.get_team_users(db, team_id)

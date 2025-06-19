@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from backend.src.config.db import get_db
 from backend.src.models import User
 from backend.src.services.auth import get_current_user
-from backend.src.schemas.evaluation import EvaluationRead, EvaluationCreate
+from backend.src.schemas import EvaluationRead, EvaluationCreate
 from backend.src.services.evaluation import evaluation_crud
 from datetime import date
 

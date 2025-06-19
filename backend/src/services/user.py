@@ -1,12 +1,10 @@
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from backend.src.models import TeamUserAssociation
+from backend.src.models import TeamUserAssociation, User, UserRole
 from backend.src.utils.security import pwd_context
 from backend.src.services.basecrud import BaseCRUD
-from backend.src.models.enum import UserRole
-from backend.src.models.user import User
-from backend.src.schemas.user import UserCreate, UserRead, UserUpdate, UserReadWithTeams, UserTeamRead
+from backend.src.schemas import UserCreate, UserRead, UserUpdate, UserReadWithTeams, UserTeamRead
 from sqlalchemy.orm import selectinload
 
 
@@ -142,6 +140,17 @@ class UserCRUD(BaseCRUD):
 
         await db.refresh(user)
         return UserRead.model_validate(user)
+
+    async def get_team_users(self, db: AsyncSession, team_id: int) -> list[UserRead]:
+        """Return all users who belong to a team."""
+        stmt = (
+            select(User)
+            .join(TeamUserAssociation, TeamUserAssociation.user_id == User.id)
+            .where(TeamUserAssociation.team_id == team_id))
+
+        result = await db.execute(stmt)
+        users = result.scalars().all()
+        return [UserRead.model_validate(user) for user in users]
 
 
 users_crud = UserCRUD()

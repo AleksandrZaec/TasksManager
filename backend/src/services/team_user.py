@@ -1,11 +1,10 @@
 from typing import List
 from backend.src.models import User, TeamUserAssociation, TeamRole
-from backend.src.schemas.task_user import AddUsersResponse, UsersRemoveResponse
-from backend.src.schemas.user import UserRead
+from backend.src.schemas import AddUsersResponse, UsersRemoveResponse, TeamUserAssociationRead, TeamUserAdd, \
+    AddedUserInfo
 from backend.src.services.basecrud import BaseCRUD
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from backend.src.schemas.team_user import TeamUserAssociationRead, TeamUserAdd, AddedUserInfo
 from sqlalchemy import select, delete, update
 from sqlalchemy.orm import aliased
 
@@ -120,18 +119,6 @@ class TeamUserCRUD(BaseCRUD):
                 detail="User is not a member of the team")
 
         return {"msg": "User role updated"}
-
-    async def get_team_users(self, db: AsyncSession, team_id: int) -> list[UserRead]:
-        """Return all users who belong to a team."""
-        stmt = (
-            select(User)
-            .join(TeamUserAssociation, TeamUserAssociation.user_id == User.id)
-            .where(TeamUserAssociation.team_id == team_id)
-        )
-
-        result = await db.execute(stmt)
-        users = result.scalars().all()
-        return [UserRead.model_validate(user) for user in users]
 
 
 team_users_crud = TeamUserCRUD()

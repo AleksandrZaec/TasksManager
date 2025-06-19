@@ -1,17 +1,14 @@
 import uuid
 from datetime import datetime, timedelta, timezone
-from backend.src.models import TeamUserAssociation
-from backend.src.models.team import Team
-from backend.src.schemas.task import TaskRead
-from backend.src.schemas.team import TeamCreate, TeamRead, TeamWithUsersAndTask, TeamUpdate
-from backend.src.schemas.team_user import TeamUserAssociationRead, TeamUserAdd
+from backend.src.models import TeamUserAssociation, TeamRole, User, Team
+from backend.src.schemas import TaskRead, TeamRead, TeamCreate, TeamUpdate, TeamWithUsersAndTask, \
+    TeamUserAssociationRead
 from backend.src.services.basecrud import BaseCRUD
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from fastapi import HTTPException, status
 from sqlalchemy.orm import selectinload
-from backend.src.services.team_user import team_users_crud
 
 
 class TeamCRUD(BaseCRUD):
@@ -26,8 +23,8 @@ class TeamCRUD(BaseCRUD):
         unique_digits = str(uuid.uuid4().int)[:4]
         return f"{clean_name}-{unique_digits}"
 
-    async def create_team(self, db: AsyncSession, team_in: TeamCreate) -> TeamRead:
-        """Create a new Team"""
+    async def create_team(self, db: AsyncSession, team_in: TeamCreate, creator_id: int) -> TeamRead:
+        """Create a new Team with optional users in one transaction."""
         result = await db.execute(select(Team).where(Team.name == team_in.name.strip()))
         existing_team = result.scalar_one_or_none()
         if existing_team:
@@ -38,26 +35,46 @@ class TeamCRUD(BaseCRUD):
         team_data = team_in.model_dump(exclude={"users"})
         team_data["name"] = team_data["name"].strip()
 
-        users = team_in.users
-
         if team_data.get("invite_code_expires_at") is None:
             team_data["invite_code_expires_at"] = datetime.now(timezone.utc) + timedelta(days=7)
+
+        users = team_in.users or []
+
+        user_ids = {user.user_id for user in users}
+        if user_ids:
+            result = await db.execute(select(User.id).where(User.id.in_(user_ids)))
+            existing_user_ids = set(result.scalars().all())
+
+            missing_users = user_ids - existing_user_ids
+            if missing_users:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"Users not found: {missing_users}")
+
+        user_roles = {
+            user.user_id: user.role if user.role else TeamRole.EXECUTOR.value
+            for user in users}
+
+        user_roles[creator_id] = TeamRole.MANAGER.value
 
         max_attempts = 5
         for attempt in range(max_attempts):
             team_data["invite_code"] = self._generate_invite_code(team_data["name"])
             team = Team(**team_data)
-
             db.add(team)
+
             try:
+                await db.flush()
+
+                for user_id, role in user_roles.items():
+                    association = TeamUserAssociation(
+                        team_id=team.id,
+                        user_id=user_id,
+                        role=role)
+                    db.add(association)
+
                 await db.commit()
                 await db.refresh(team)
-
-                if users:
-                    try:
-                        await team_users_crud.add_users(db, team.id, users)
-                    except Exception as e:
-                        raise HTTPException(status_code=500, detail=f"Failed to add users to team: {e}")
 
                 return TeamRead.model_validate(team)
 
@@ -69,7 +86,6 @@ class TeamCRUD(BaseCRUD):
                     raise HTTPException(
                         status_code=status.HTTP_400_BAD_REQUEST,
                         detail="Team with this name already exists")
-
                 elif "teams_invite_code_key" in err_msg or (
                         "unique constraint" in err_msg and "invite_code" in err_msg):
                     if attempt == max_attempts - 1:
@@ -140,8 +156,18 @@ class TeamCRUD(BaseCRUD):
             name=team.name,
             description=team.description,
             team_users=flat_team_users,
-            tasks=[TaskRead.model_validate(task) for task in team.tasks]
+            tasks=[TaskRead.model_validate(task) for task in team.tasks])
+
+    async def get_user_teams(self, db: AsyncSession, user_id: int) -> list[TeamRead]:
+        """Возвращает все команды, в которых состоит пользователь."""
+        stmt = (
+            select(Team)
+            .join(TeamUserAssociation, Team.id == TeamUserAssociation.team_id)
+            .where(TeamUserAssociation.user_id == user_id)
         )
+        result = await db.execute(stmt)
+        teams = result.scalars().all()
+        return [TeamRead.model_validate(team) for team in teams]
 
 
 teams_crud = TeamCRUD()

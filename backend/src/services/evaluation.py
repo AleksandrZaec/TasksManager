@@ -2,7 +2,7 @@ from datetime import datetime, date, timezone, time
 from backend.src.models import TaskAssigneeAssociation, EvaluationAssociation, User
 from backend.src.services.basecrud import BaseCRUD
 from backend.src.models.evaluation import Evaluation
-from backend.src.schemas.evaluation import EvaluationCreate, EvaluationRead
+from backend.src.schemas import EvaluationCreate, EvaluationRead
 from sqlalchemy import and_, select, func
 from fastapi import HTTPException
 from sqlalchemy.exc import SQLAlchemyError

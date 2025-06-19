@@ -2,8 +2,7 @@ from typing import List
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from backend.src.config.db import get_db
-from backend.src.schemas.comment import CommentRead, CommentBase, CommentUpdate
-from backend.src.schemas.user import UserPayload
+from backend.src.schemas import CommentRead, CommentBase, CommentUpdate, UserPayload
 from backend.src.services.auth import get_current_user
 from backend.src.services.comment import comment_crud
 

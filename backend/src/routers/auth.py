@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from backend.src.services.auth import decode_refresh_token
+from backend.src.services.user import users_crud
 from backend.src.utils.security import verify_password, create_access_token, create_refresh_token
 from backend.src.config.db import get_db
-from backend.src.services.user import UserCRUD
 from fastapi import Body
-from backend.src.schemas.auth import LoginRequest
+from backend.src.schemas import LoginRequest
 
 router = APIRouter()
 
@@ -13,7 +13,7 @@ router = APIRouter()
 @router.post("/login")
 async def login(data: LoginRequest, db: AsyncSession = Depends(get_db)) -> dict[str, str]:
     """Authenticate user and return a JWT access token."""
-    user_data = await UserCRUD.get_for_login(db, data.email)
+    user_data = await users_crud.get_for_login(db, data.email)
     if not user_data or not verify_password(data.password, user_data["password"]):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

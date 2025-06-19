@@ -1,5 +1,5 @@
 from sqlalchemy.orm import relationship, Mapped, mapped_column
-from sqlalchemy import Enum, String
+from sqlalchemy import Enum, String, Boolean
 from typing import List
 from backend.src.config.db import Base
 from backend.src.models.enum import UserRole
@@ -19,7 +19,7 @@ class User(Base):
     last_name: Mapped[str] = mapped_column(String(20), nullable=False, index=True)
     role: Mapped[UserRole] = mapped_column(Enum(UserRole), default=UserRole.USER, nullable=False)
     is_active: Mapped[bool] = mapped_column(default=True)
-
+    is_superuser: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     comments: Mapped[List["Comment"]] = relationship(
         "Comment",
         back_populates="author",
@@ -48,14 +48,9 @@ class User(Base):
         cascade="save-update, merge"
     )
 
-    assigned_tasks: Mapped[List["Task"]] = relationship(
-        "Task",
-        secondary="task_assignee_association",
-        back_populates="assignees"
-    )
-
     task_associations: Mapped[List["TaskAssigneeAssociation"]] = relationship(
-        back_populates="user"
+        back_populates="user",
+        overlaps="assigned_tasks"
     )
 
     meetings: Mapped[List["Meeting"]] = relationship(

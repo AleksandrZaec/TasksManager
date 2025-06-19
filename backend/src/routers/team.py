@@ -1,18 +1,31 @@
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from backend.src.config.db import get_db
-from backend.src.schemas.team import TeamCreate, TeamUpdate, TeamRead, TeamWithUsersAndTask
+from backend.src.models import User
+from backend.src.schemas import TeamCreate, TeamUpdate, TeamRead, TeamWithUsersAndTask
+from backend.src.services.auth import get_current_user
 from backend.src.services.team import teams_crud
 from typing import List
-
 
 router = APIRouter()
 
 
 @router.post("/", response_model=TeamRead, status_code=status.HTTP_201_CREATED)
-async def create_team(team_in: TeamCreate, db: AsyncSession = Depends(get_db)) -> TeamRead:
+async def create_team(
+        team_in: TeamCreate,
+        db: AsyncSession = Depends(get_db),
+        current_user: User = Depends(get_current_user)
+) -> TeamRead:
     """Create a new team."""
-    return await teams_crud.create_team(db, team_in)
+    return await teams_crud.create_team(db, team_in, current_user.id)
+
+
+@router.get("/my_teams", response_model=list[TeamRead])
+async def get_my_teams(
+        db: AsyncSession = Depends(get_db),
+        current_user: User = Depends(get_current_user),
+) -> list[TeamRead]:
+    return await teams_crud.get_user_teams(db, current_user.id)
 
 
 @router.get("/{team_id}", response_model=TeamWithUsersAndTask)
@@ -38,6 +51,3 @@ async def delete_team(team_id: int, db: AsyncSession = Depends(get_db)) -> None:
     """Delete a team by ID."""
     await teams_crud.delete(db, team_id)
     return None
-
-
-

@@ -28,6 +28,7 @@ class Task(Base):
         cascade="all, delete-orphan",
         passive_deletes=True
     )
+
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
@@ -38,12 +39,6 @@ class Task(Base):
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
         onupdate=lambda: datetime.now(timezone.utc)
-    )
-
-    assignees: Mapped[List["User"]] = relationship(
-        "User",
-        secondary="task_assignee_association",
-        back_populates="assigned_tasks"
     )
 
     evaluations: Mapped[List["Evaluation"]] = relationship(

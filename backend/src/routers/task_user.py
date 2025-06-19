@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from backend.src.schemas.task_user import TaskAssigneeCreate, RoleUpdatePayload, AddUsersResponse, UsersRemoveResponse, \
+from backend.src.schemas import TaskAssigneeCreate, RoleUpdatePayload, AddUsersResponse, UsersRemoveResponse, \
     UsersRemoveRequest, RoleUpdateResponse
 from backend.src.config.db import get_db
 from backend.src.services.task_user import task_user_crud

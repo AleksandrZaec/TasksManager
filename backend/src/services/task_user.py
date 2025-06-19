@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, delete, update
 from fastapi import HTTPException, status
 from backend.src.models import TaskAssigneeAssociation, User
-from backend.src.schemas.task_user import TaskUserAdd, AddUsersResponse, AddedUserInfo, \
+from backend.src.schemas import TaskUserAdd, AddUsersResponse, AddedUserInfo, \
     UsersRemoveResponse, RoleUpdatePayload, RoleUpdateResponse
 from backend.src.services.basecrud import BaseCRUD
 from sqlalchemy.orm import aliased
