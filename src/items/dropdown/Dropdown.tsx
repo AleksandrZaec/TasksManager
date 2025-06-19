@@ -48,6 +48,10 @@ export const Dropdown = ({
       document.removeEventListener('mousedown', handleClose);
     };
   }, []);
+  const handleTitle = (title: string) => {
+    setSelectedTeam?.(title);
+    setOpenDropdown(false);
+  };
   return (
     <div className={s.dropdown} ref={dropdownRef}>
       <Button type={'dropdown'} onClick={handleOpenDropdown} chevron={openDropdown ? 'up' : 'down'}>
@@ -68,7 +72,7 @@ export const Dropdown = ({
                 key={listItem.name}
                 title={listItem.name}
                 selectedTeam={selectedTeam}
-                setSelectedTeam={setSelectedTeam}
+                onSelect={handleTitle}
               />
             ))
           )}
