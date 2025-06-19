@@ -4,7 +4,7 @@ from typing import List, Optional
 from backend.src.models import TaskStatus, TaskPriority, User
 from backend.src.services.auth import get_current_user
 from backend.src.services.task import tasks_crud
-from backend.src.schemas.task import TaskCreate, TaskUpdate, TaskRead, TaskShortRead, TaskStatusUpdate, TaskFilter
+from backend.src.schemas  import TaskCreate, TaskUpdate, TaskRead, TaskShortRead, TaskStatusUpdate, TaskFilter
 from backend.src.config.db import get_db
 
 router = APIRouter()

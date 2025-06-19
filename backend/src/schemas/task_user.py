@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from datetime import datetime
 from typing import Optional, List
+from backend.src.schemas.team_user import AddedUserInfo
 
 
 class AssigneeInfo(BaseModel):
@@ -36,16 +37,6 @@ class RoleUpdateResponse(BaseModel):
     """For update role executor in task"""
     msg: str
 
-
-class AddedUserInfo(BaseModel):
-    """Information about a user successfully added to the task ot team."""
-    id: int
-    email: str
-    first_name: str
-    last_name: str
-
-    class Config:
-        from_attributes = True
 
 
 class AddUsersResponse(BaseModel):

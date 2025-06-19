@@ -1,7 +1,7 @@
 from typing import List
 from sqlalchemy.ext.asyncio import AsyncSession
 from backend.src.models import Comment
-from backend.src.schemas.comment import CommentRead, CommentBase, CommentUpdate
+from backend.src.schemas import CommentRead, CommentBase, CommentUpdate
 from backend.src.services.basecrud import BaseCRUD
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload

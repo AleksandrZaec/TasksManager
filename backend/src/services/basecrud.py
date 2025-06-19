@@ -57,7 +57,7 @@ class BaseCRUD:
 
         return self.read_schema.model_validate(obj)
 
-    async def delete(self, db: AsyncSession, obj_id: int) -> dict:
+    async def delete(self, db: AsyncSession, obj_id: int) -> None:
         """Delete object by its ID."""
         result = await db.execute(select(self.model).where(self.model.id == obj_id))
         obj = result.scalar_one_or_none()
@@ -71,5 +71,4 @@ class BaseCRUD:
             await db.rollback()
             raise HTTPException(status_code=500, detail=f"Database error: {e}")
 
-        return {"message": f"{self.model.__name__} deleted successfully", "id": obj_id}
 

@@ -12,7 +12,6 @@ class TeamBase(BaseModel):
     description: Optional[str] = Field(default=None, max_length=200)
 
     @field_validator('name')
-    @classmethod
     def validate_name(cls, v: str) -> str:
         """Validate team name."""
         v = v.strip()
@@ -34,7 +33,6 @@ class TeamCreate(TeamBase):
     users: Optional[List[TeamUserAdd]] = None
 
     @field_validator("users")
-    @classmethod
     def check_unique_user_ids(cls, users):
         if users is None:
             return users

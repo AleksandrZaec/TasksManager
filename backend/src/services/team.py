@@ -1,10 +1,8 @@
 import uuid
 from datetime import datetime, timedelta, timezone
-from backend.src.models import TeamUserAssociation, TeamRole, User
-from backend.src.models.team import Team
-from backend.src.schemas.task import TaskRead
-from backend.src.schemas.team import TeamCreate, TeamRead, TeamWithUsersAndTask, TeamUpdate
-from backend.src.schemas.team_user import TeamUserAssociationRead, TeamUserAdd
+from backend.src.models import TeamUserAssociation, TeamRole, User, Team
+from backend.src.schemas import TaskRead, TeamRead, TeamCreate, TeamUpdate, TeamWithUsersAndTask, \
+    TeamUserAssociationRead
 from backend.src.services.basecrud import BaseCRUD
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
@@ -158,8 +156,18 @@ class TeamCRUD(BaseCRUD):
             name=team.name,
             description=team.description,
             team_users=flat_team_users,
-            tasks=[TaskRead.model_validate(task) for task in team.tasks]
+            tasks=[TaskRead.model_validate(task) for task in team.tasks])
+
+    async def get_user_teams(self, db: AsyncSession, user_id: int) -> list[TeamRead]:
+        """Возвращает все команды, в которых состоит пользователь."""
+        stmt = (
+            select(Team)
+            .join(TeamUserAssociation, Team.id == TeamUserAssociation.team_id)
+            .where(TeamUserAssociation.user_id == user_id)
         )
+        result = await db.execute(stmt)
+        teams = result.scalars().all()
+        return [TeamRead.model_validate(team) for team in teams]
 
 
 teams_crud = TeamCRUD()

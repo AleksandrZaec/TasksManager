@@ -2,41 +2,64 @@ from typing import List, Optional
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, or_
-from backend.src.models import Task, TaskStatus, TaskPriority, User, TaskAssigneeAssociation
+from backend.src.models import Task, TaskStatus, TaskPriority, User, TaskAssigneeAssociation, TeamUserAssociation
 from backend.src.models.task_status_history import TaskStatusHistory
-from backend.src.schemas.task import TaskRead, TaskShortRead, TaskCreate, TaskUpdate
-from backend.src.schemas.task_user import AssigneeInfo
+from backend.src.schemas import AssigneeInfo, TaskRead, TaskShortRead, TaskCreate, TaskUpdate
 from backend.src.services.basecrud import BaseCRUD
 from sqlalchemy.orm import selectinload
-from backend.src.services.task_user import task_user_crud
+
 
 
 class TaskCRUD(BaseCRUD):
+    """CRUD for Task"""
     def __init__(self):
         super().__init__(model=Task, read_schema=TaskRead)
 
     async def create_task(self, db: AsyncSession, task_in: TaskCreate, creator_id: int, team_id: int) -> TaskShortRead:
-        """Create a new task with the given input, creator, and team."""
         data = task_in.model_dump(exclude={"assignees"})
         data["creator_id"] = creator_id
         data["team_id"] = team_id
 
         task = Task(**data)
         db.add(task)
+
         try:
+            await db.flush()
+            await db.refresh(task)
+
+            if task_in.assignees:
+                unique_assignees = {(a.user_id, a.role or "EXECUTOR"): a for a in task_in.assignees}.values()
+                user_ids = {a.user_id for a in unique_assignees}
+
+                result = await db.execute(
+                    select(User.id)
+                    .join(TeamUserAssociation, TeamUserAssociation.user_id == User.id)
+                    .where(
+                        User.id.in_(user_ids),
+                        TeamUserAssociation.team_id == team_id))
+                valid_user_ids = set(result.scalars().all())
+
+                missing_user_ids = user_ids - valid_user_ids
+                if missing_user_ids:
+                    raise HTTPException(
+                        status_code=400,
+                        detail=f"Users not found or not in team: {missing_user_ids}")
+
+                for assignee in unique_assignees:
+                    association = TaskAssigneeAssociation(
+                        task_id=task.id,
+                        user_id=assignee.user_id,
+                        role=assignee.role or "EXECUTOR")
+                    db.add(association)
+
             await db.commit()
             await db.refresh(task)
+
+            return TaskShortRead.model_validate(task)
+
         except Exception as e:
             await db.rollback()
-            raise HTTPException(status_code=500, detail=f"Database error: {e}")
-
-        if task_in.assignees:
-            try:
-                await task_user_crud.add_executors(db, task.id, task_in.assignees)
-            except Exception as e:
-                raise HTTPException(status_code=500, detail=f"Failed to assign users: {e}")
-
-        return TaskShortRead.model_validate(task)
+            raise HTTPException(status_code=500, detail=f"Failed to create task: {e}")
 
     async def update_task(self, db: AsyncSession, task_id: int, task_in: TaskUpdate, creator_id: int) -> TaskShortRead:
         """Update an existing task and update the creator_id from the token."""
@@ -150,15 +173,16 @@ class TaskCRUD(BaseCRUD):
         """Retrieves the tasks that the user is associated with, using the filters"""
         stmt = (
             select(Task)
-            .options(selectinload(Task.assignees))
+            .options(
+                selectinload(Task.assignee_associations)
+                .selectinload(TaskAssigneeAssociation.user) )
             .distinct()
             .where(
                 or_(
                     Task.creator_id == user_id,
-                    Task.assignees.any(User.id == user_id)
-                )
-            )
-        )
+                    Task.assignee_associations.any(
+                        TaskAssigneeAssociation.user_id == user_id))))
+
         if team_id is not None:
             stmt = stmt.where(Task.team_id == team_id)
 

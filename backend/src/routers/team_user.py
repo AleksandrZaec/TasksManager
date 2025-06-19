@@ -1,10 +1,9 @@
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from backend.src.config.db import get_db
-from backend.src.schemas.task_user import AddUsersResponse, UsersRemoveResponse, UsersRemoveRequest
-from backend.src.schemas.team_user import TeamUserUpdateRole, TeamUsersCreate
-from typing import Dict, List
-from backend.src.schemas.user import UserRead
+from typing import Dict
+from backend.src.schemas import AddUsersResponse, TeamUsersCreate, UsersRemoveResponse, UsersRemoveRequest, \
+    TeamUserUpdateRole
 from backend.src.services.team_user import team_users_crud
 
 router = APIRouter()
@@ -39,9 +38,3 @@ async def update_user_role_in_team(
 ) -> Dict[str, str]:
     """Update a user's role in a team."""
     return await team_users_crud.update_user_role(db, team_id, user_id, role_data.role)
-
-
-@router.get("/teams/{team_id}/users", response_model=List[UserRead])
-async def get_team_users(team_id: int, db: AsyncSession = Depends(get_db)) -> List[UserRead]:
-    """Get all users who are members of the team."""
-    return await team_users_crud.get_team_users(db, team_id)

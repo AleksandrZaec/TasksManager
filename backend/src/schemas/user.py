@@ -48,7 +48,6 @@ class UserCreate(BaseModel):
     password: str
 
     @field_validator('password')
-    @classmethod
     def password_strong(cls, value: str) -> str:
         if len(value) < 8:
             raise ValueError('Password must be at least 8 characters long')
@@ -67,7 +66,6 @@ class UserUpdate(BaseModel):
     password: Optional[str] = None
 
     @field_validator('password')
-    @classmethod
     def password_strong(cls, value: Optional[str]) -> Optional[str]:
         if value is None:
             return value
