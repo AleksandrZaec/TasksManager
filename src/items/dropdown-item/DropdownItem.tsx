@@ -4,12 +4,15 @@ import s from './Dropdown.module.scss';
 type DropdownItemProps = {
   title: string;
   selectedTeam?: string;
-  setSelectedTeam?: (nameTeam: string) => void;
+  onSelect?: (nameTeam: string) => void;
 };
-export const DropdownItem = ({ title, selectedTeam, setSelectedTeam }: DropdownItemProps) => {
+export const DropdownItem = ({ title, selectedTeam, onSelect }: DropdownItemProps) => {
+  const handleTitle = () => {
+    onSelect?.(title);
+  };
   return (
     <p
-      onClick={() => setSelectedTeam?.(title)}
+      onClick={handleTitle}
       key={title}
       className={clsx(s.title, { [s.selected]: title === selectedTeam })}>
       {title}
