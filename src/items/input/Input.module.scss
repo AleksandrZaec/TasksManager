@@ -5,6 +5,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  position: relative;
 }
 .title {
   color: #000000;
@@ -41,8 +42,8 @@
 .icon {
   position: absolute;
   width: 36px;
-  right: 8px;
-  top: 16px;
+  right: 15px;
+  top: 30px;
 }
 
 @media (max-width: $tablet) {

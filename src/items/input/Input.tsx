@@ -6,19 +6,20 @@ import openEye from '/icons/open_eye.png';
 type InputProps = {
   label: string;
   placeholder: string;
-  type: 'email' | 'password';
+  type: 'email' | 'password' | 'text';
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onBlur?: () => void;
   error?: boolean;
+  extraClass?: string;
 };
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, placeholder, type, onChange, onBlur, error = false, ...rest }, ref) => {
+  ({ label, placeholder, type, onChange, onBlur, error = false, extraClass, ...rest }, ref) => {
     const [showIcon, setShowIcons] = useState(false);
     const typePassword = type === 'password';
     const currentType = typePassword && showIcon ? 'text' : type;
 
     return (
-      <div className={s.field}>
+      <div className={clsx(s.field, extraClass)}>
         <p className={s.title}>{label}</p>
         <input
           type={currentType}
@@ -30,7 +31,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           onBlur={onBlur}
         />
         {typePassword && (
-          <div className={s.icon} onClick={() => setShowIcons((prev) => !prev)}>
+          <div onClick={() => setShowIcons((prev) => !prev)}>
             <img src={showIcon ? openEye : closeEye} alt='icon' className={s.icon} />
           </div>
         )}

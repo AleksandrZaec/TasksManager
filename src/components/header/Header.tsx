@@ -1,7 +1,7 @@
 import { Block } from '../../items/block/Block';
 import { Button } from '../../items/button/Button';
 import { Dropdown } from '../../items/dropdown/Dropdown';
-import { listTeams, profileList } from '../../mockData';
+import { listTeams } from '../../mockData';
 import s from './Header.module.scss';
 
 type HeaderProps = {
@@ -24,7 +24,7 @@ export const Header = ({ children, setSelectedTeam, selectedTeam }: HeaderProps)
             setSelectedTeam={setSelectedTeam}></Dropdown>
           <Button type={'dropdown'}>Календарь</Button>
           <Button type={'dropdown'}>Встречи</Button>
-          <Dropdown title={'Профиль'} list={profileList}></Dropdown>
+          <Dropdown title={'Иван Иванов'} profile={true}></Dropdown>
         </Block>
         {children}
       </div>

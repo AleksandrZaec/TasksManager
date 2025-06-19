@@ -4,6 +4,9 @@ import { Button } from '../button/Button';
 import s from './Dropdown.module.scss';
 import { DropdownItem } from '../dropdown-item/DropdownItem';
 import clsx from 'clsx';
+import style from '../dropdown-item/Dropdown.module.scss';
+import { useNavigate } from 'react-router-dom';
+import { ROUTES } from '../../route/Routes';
 
 export type ListProps = {
   name: string;
@@ -11,15 +14,26 @@ export type ListProps = {
 type DropdownProps = {
   title: string;
   data?: ListProps[];
-  list?: string[];
+  profile?: boolean;
   selectedTeam?: string;
   setSelectedTeam?: (nameTeam: string) => void;
 };
-export const Dropdown = ({ title, data, list, selectedTeam, setSelectedTeam }: DropdownProps) => {
+export const Dropdown = ({
+  title,
+  data,
+  profile,
+  selectedTeam,
+  setSelectedTeam,
+}: DropdownProps) => {
   const [openDropdown, setOpenDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
   const handleOpenDropdown = () => {
     setOpenDropdown((prev) => !prev);
+  };
+
+  const handleNavigateProfile = () => {
+    navigate(ROUTES.PROFILE);
   };
 
   useEffect(() => {
@@ -40,24 +54,24 @@ export const Dropdown = ({ title, data, list, selectedTeam, setSelectedTeam }: D
         {title}
       </Button>
       {openDropdown && (
-        <Block extraClass={clsx(s.block, { [s.profile]: list })}>
-          {list
-            ? list.map((item) => (
-                <DropdownItem
-                  key={item}
-                  title={item}
-                  selectedTeam={selectedTeam}
-                  setSelectedTeam={setSelectedTeam}
-                />
-              ))
-            : data?.map((listItem) => (
-                <DropdownItem
-                  key={listItem.name}
-                  title={listItem.name}
-                  selectedTeam={selectedTeam}
-                  setSelectedTeam={setSelectedTeam}
-                />
-              ))}
+        <Block extraClass={clsx(s.block, { [s.profile]: profile })}>
+          {profile ? (
+            <>
+              <p className={style.title} onClick={handleNavigateProfile}>
+                Профиль
+              </p>
+              <p className={style.title}>Выйти</p>
+            </>
+          ) : (
+            data?.map((listItem) => (
+              <DropdownItem
+                key={listItem.name}
+                title={listItem.name}
+                selectedTeam={selectedTeam}
+                setSelectedTeam={setSelectedTeam}
+              />
+            ))
+          )}
         </Block>
       )}
     </div>
