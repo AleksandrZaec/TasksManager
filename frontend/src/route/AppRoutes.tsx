@@ -20,6 +20,7 @@ export const AppRoutes = () => {
         <Route path={ROUTES.NOT_FOUND} element={<NotFoundPage />} />
       </Route>
       <Route path={ROUTES.HOME} element={<MainPage />} />
+      <Route path={ROUTES.TASK} element={<MainPage />} />
     </Routes>
   );
 };

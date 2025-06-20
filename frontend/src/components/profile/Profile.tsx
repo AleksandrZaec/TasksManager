@@ -13,7 +13,7 @@ import { BackNavButton } from '@items/back-nav-button/BackNavButton';
 export const Profile = () => {
   const [selectedTeam, setSelectedTeam] = useState<string>('Team1');
   const currentName = 'Иванов';
-  const currentExecutorr = mockData.filter((item) => item.executor === currentName);
+  const currentExecutorr = mockData.filter((item) => item.executor.includes(currentName));
   const navigate = useNavigate();
   const handleSetting = () => {
     navigate(ROUTES.SETTING);

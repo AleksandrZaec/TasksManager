@@ -1,0 +1,7 @@
+@use '@styles/styles.scss' as *;
+
+.name {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}

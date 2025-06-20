@@ -5,4 +5,5 @@ export const ROUTES = {
   PROFILE: '/profile',
   SETTING: 'setting',
   NOT_FOUND: '*',
+  TASK: '/task/:id'
 };
