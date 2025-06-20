@@ -1,5 +1,5 @@
 // import { Block } from '../../items/block/Block';
-import { Block } from '../../../../../frontend/frontend/src/items/block/Block';
+import { Block } from '../../items/block/Block';
 import { Button } from '../../items/button/Button';
 import { Dropdown } from '../../items/dropdown/Dropdown';
 import { listTeams } from '../../mockData';
