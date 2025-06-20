@@ -1,6 +1,6 @@
 import s from './LoginPage.module.scss';
 import man from '/images/man.png';
-import { Login } from '../../components/login/Login';
+import { Login } from '@components/login/Login';
 export const LoginPage = () => {
   return (
     <div className={s.container}>

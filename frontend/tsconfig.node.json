@@ -19,13 +19,6 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
-
-    "baseUrl": ".",
-    "paths": {
-      "@components/*": ["frontend/src/components/*"],
-      "@items/*": ["frontend/src/items/*"],
-      "@utils/*": ["frontend/src/utils/*"]
-    }
   },
   "include": ["vite.config.ts"]
 }

@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
-import { Block } from '../block/Block';
-import { Button } from '../button/Button';
+import { Block } from '@items/block/Block';
+import { Button } from '@items/button/Button';
 import s from './Dropdown.module.scss';
-import { DropdownItem } from '../dropdown-item/DropdownItem';
+import { DropdownItem } from '@items/dropdown-item/DropdownItem';
 import clsx from 'clsx';
-import style from '../dropdown-item/Dropdown.module.scss';
+import style from '@items/dropdown-item/Dropdown.module.scss';
 import { useNavigate } from 'react-router-dom';
-import { ROUTES } from '../../route/Routes';
+import { ROUTES } from '@route/Routes';
 
 export type ListProps = {
   name: string;

@@ -1,8 +1,8 @@
-import { Block } from '../../block/Block';
-import { FormField } from '../../form-field/FormField';
-import s from '../../../components/setting/Setting.module.scss';
-import { validation } from '../../form-field/validation';
-import { Button } from '../../button/Button';
+import { Block } from '@items/block/Block';
+import { FormField } from '@items/form-field/FormField';
+import s from '@components/setting/Setting.module.scss';
+import { validation } from '@items/form-field/validation';
+import { Button } from '@items/button/Button';
 import { useForm } from 'react-hook-form';
 
 type FormValues = {

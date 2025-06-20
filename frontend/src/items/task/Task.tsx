@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { TaskType } from '../../mockData';
+import { TaskType } from '@utils/mockData';
 import s from './Task.module.scss';
 
 type TaskProps = {

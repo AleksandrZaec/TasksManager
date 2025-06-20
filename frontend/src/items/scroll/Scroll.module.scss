@@ -1,7 +1,6 @@
-@use '../../styles/styles.scss' as *;
+@use '@styles/styles.scss' as *;
 
 .scrollBox {
-  // height: 150px;
   overflow: hidden;
 }
 .scroll {

@@ -15,6 +15,3 @@ export const Scroll = forwardRef<HTMLDivElement, ScrollProps>(({ extraClass, chi
     </div>
   );
 });
-
-// Добавляем displayName для ESLint
-// Scroll.displayName = 'Scroll';

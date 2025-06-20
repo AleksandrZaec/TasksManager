@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
-import { Block } from '../../items/block/Block';
+import { Block } from '@items/block/Block';
 import s from './NotFound.module.scss';
-import { ROUTES } from '../../route/Routes';
+import { ROUTES } from '@route/Routes';
 
 export const NotFound = () => {
   const navigate = useNavigate();

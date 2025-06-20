@@ -2,13 +2,13 @@ import { useState } from 'react';
 import { Header } from '../header/Header';
 import s from './Profile.module.scss';
 import style from '../main/Main.module.scss';
-import { Block } from '../../items/block/Block';
-import { Button } from '../../items/button/Button';
-import { mockData } from '../../mockData';
-import { TasksUser } from '../../items/tasks-user/TasksUser';
+import { Block } from '@items/block/Block';
+import { Button } from '@items/button/Button';
+import { mockData } from '@utils/mockData';
+import { TasksUser } from '@items/tasks-user/TasksUser';
 import { Outlet, useNavigate } from 'react-router-dom';
-import { ROUTES } from '../../route/Routes';
-import { BackNavButton } from '../../items/back-nav-button/BackNavButton';
+import { ROUTES } from '@route/Routes';
+import { BackNavButton } from '@items/back-nav-button/BackNavButton';
 
 export const Profile = () => {
   const [selectedTeam, setSelectedTeam] = useState<string>('Team1');

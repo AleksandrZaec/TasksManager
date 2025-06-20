@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { Button } from '../../items/button/Button';
-import { TaskList } from '../../items/task-list/TaskList';
+import { Button } from '@items/button/Button';
+import { TaskList } from '@items/task-list/TaskList';
 import { Header } from '../header/Header';
 import s from './Main.module.scss';
-import { mockData, TaskType } from '../../mockData';
+import { mockData, TaskType } from '@utils/mockData';
 
 export const Main = () => {
   const [selectedTeam, setSelectedTeam] = useState<string>('Team1');

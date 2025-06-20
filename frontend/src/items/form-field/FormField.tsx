@@ -1,6 +1,6 @@
 import { Control, Controller, FieldPath, FieldValues, RegisterOptions } from 'react-hook-form';
-import { Input } from '../input/Input';
-import { Tooltip } from '../tooltip/Tooltip';
+import { Input } from '@items/input/Input';
+import { Tooltip } from '@items/tooltip/Tooltip';
 import s from './FormField.module.scss';
 
 interface FormFieldProps<TFieldValues extends FieldValues> {

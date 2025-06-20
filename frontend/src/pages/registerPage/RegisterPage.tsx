@@ -1,6 +1,6 @@
 import s from '../loginPage/LoginPage.module.scss';
 import woman from '/images/woman.png';
-import { Register } from '../../components/register/Register';
+import { Register } from '@components/register/Register';
 
 export const RegisterPage = () => {
   return (

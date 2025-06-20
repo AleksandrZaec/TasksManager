@@ -1,8 +1,8 @@
-import { allStatus, column, TaskType } from '../../mockData';
-import { Block } from '../block/Block';
-import { Button } from '../button/Button';
-import { Scroll } from '../scroll/Scroll';
-import { Task } from '../task/Task';
+import { allStatus, column, TaskType } from '@utils/mockData';
+import { Block } from '@items/block/Block';
+import { Button } from '@items/button/Button';
+import { Scroll } from '@items/scroll/Scroll';
+import { Task } from '@items/task/Task';
 import s from './TaskList.module.scss';
 
 type TaskTableProps = {

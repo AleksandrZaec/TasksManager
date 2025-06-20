@@ -1,11 +1,12 @@
 import { useForm } from 'react-hook-form';
-import { FormField } from '../../items/form-field/FormField';
+import { FormField } from '@items/form-field/FormField';
 import s from './Login.module.scss';
 import { useEffect, useState } from 'react';
-import { validation } from '../../items/form-field/validation';
+import { validation } from '@items/form-field/validation';
 import { useNavigate } from 'react-router-dom';
-import { ROUTES } from '../../route/Routes';
-import { Button } from '../../items/button/Button';
+import { ROUTES } from '@route/Routes';
+import { Button } from '@items/button/Button';
+
 
 type FormValues = {
   email: string;

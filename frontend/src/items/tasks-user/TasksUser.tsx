@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react';
-import { columnUser, TaskType, titles } from '../../mockData';
-import { Block } from '../block/Block';
-import { Scroll } from '../scroll/Scroll';
-import { Task } from '../task/Task';
+import { columnUser, TaskType, titles } from '@utils/mockData';
+import { Block } from '@items/block/Block';
+import { Scroll } from '@items/scroll/Scroll';
+import { Task } from '@items/task/Task';
 import s from './TasksUser.module.scss';
 import clsx from 'clsx';
 

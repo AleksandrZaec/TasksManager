@@ -1,7 +1,7 @@
-import { EmailSetting } from '../../items/formSetting/email/EmailSetting';
-import { FirstNameSetting } from '../../items/formSetting/first-name/FirstNameSetting';
-import { LastNameSetting } from '../../items/formSetting/last-name/LastNameSetting';
-import { PasswordSetting } from '../../items/formSetting/password/PasswordSetting';
+import { EmailSetting } from '@items/formSetting/email/EmailSetting';
+import { FirstNameSetting } from '@items/formSetting/first-name/FirstNameSetting';
+import { LastNameSetting } from '@items/formSetting/last-name/LastNameSetting';
+import { PasswordSetting } from '@items/formSetting/password/PasswordSetting';
 import s from './Setting.module.scss';
 
 export const Setting = () => {

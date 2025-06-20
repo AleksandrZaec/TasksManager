@@ -1,8 +1,7 @@
-// import { Block } from '../../items/block/Block';
-import { Block } from '../../items/block/Block';
-import { Button } from '../../items/button/Button';
-import { Dropdown } from '../../items/dropdown/Dropdown';
-import { listTeams } from '../../mockData';
+import { Block } from '@items/block/Block';
+import { Button } from '@items/button/Button';
+import { Dropdown } from '@items/dropdown/Dropdown';
+import { listTeams } from '@utils/mockData';
 import s from './Header.module.scss';
 
 type HeaderProps = {
