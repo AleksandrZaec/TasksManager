@@ -4,7 +4,6 @@ from sqlalchemy import select
 from backend.src.models import User
 from backend.src.config.db import SessionLocal
 from backend.src.utils.security import verify_password
-from fastapi import HTTPException
 
 
 class AdminAuth(AuthenticationBackend):
