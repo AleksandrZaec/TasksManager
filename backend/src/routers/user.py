@@ -19,7 +19,7 @@ router = APIRouter()
 )
 async def read_users(
         db: AsyncSession = Depends(get_db),
-        # current_user: UserPayload = Depends(is_admin)
+        current_user: UserPayload = Depends(is_admin)
 ) -> List[UserRead]:
     """Get a list of all users."""
     return await users_crud.get_all(db)

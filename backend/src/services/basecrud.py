@@ -70,5 +70,3 @@ class BaseCRUD:
         except Exception as e:
             await db.rollback()
             raise HTTPException(status_code=500, detail=f"Database error: {e}")
-
-

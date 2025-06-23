@@ -80,4 +80,4 @@ class UserPayload(BaseModel):
     """The payload model for the JWT token."""
     id: int
     role: str
-    teams: List[UserTeamInfo] = []
+    teams: List[UserTeamInfo] = Field(default_factory=list)

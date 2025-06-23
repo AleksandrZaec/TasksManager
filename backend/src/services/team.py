@@ -19,7 +19,7 @@ class TeamCRUD(BaseCRUD):
 
     def _generate_invite_code(self, name: str) -> str:
         """Generate invite code from team name plus 4 digits from UUID4."""
-        clean_name = name.replace(" ", "").upper()
+        clean_name = name.replace(" ", "").upper()[:4]
         unique_digits = str(uuid.uuid4().int)[:4]
         return f"{clean_name}-{unique_digits}"
 

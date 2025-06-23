@@ -30,7 +30,7 @@ class Meeting(Base):
         default=lambda: datetime.now(timezone.utc),
         nullable=False
     )
-    cancelled_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    cancelled_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     cancelled_by_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
 
     creator: Mapped["User"] = relationship(

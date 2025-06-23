@@ -165,10 +165,10 @@ class TestSetGlobalRole:
 @pytest.mark.asyncio
 class TestUserCRUDGetTeamUsers:
 
-    async def test_team_has_no_users(self, test_session: AsyncSession, team_crud, users_crud):
+    async def test_team_has_no_users(self, test_session: AsyncSession, teams_crud, users_crud):
         """Test that get_team_users returns empty list if no users in team."""
         team_in = TeamCreate(name="Empty Team", description="No users")
-        team = await team_crud.create_team(test_session, team_in=team_in, creator_id=None)
+        team = await teams_crud.create_team(test_session, team_in=team_in, creator_id=None)
 
         users = await users_crud.get_team_users(test_session, team.id)
         assert users == []

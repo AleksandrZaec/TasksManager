@@ -68,16 +68,13 @@ class TaskAssigneeCRUD(BaseCRUD):
                     first_name=data["first_name"],
                     last_name=data["last_name"]))
 
-        if not new_assocs:
-            raise HTTPException(status_code=400, detail="No new users to add or all users already assigned")
-
-        db.add_all(new_assocs)
-
-        try:
-            await db.commit()
-        except Exception as e:
-            await db.rollback()
-            raise HTTPException(status_code=500, detail=f"Database error: {e}")
+        if new_assocs:
+            db.add_all(new_assocs)
+            try:
+                await db.commit()
+            except Exception as e:
+                await db.rollback()
+                raise HTTPException(status_code=500, detail=f"Database error: {e}")
 
         return AddUsersResponse(added=added, errors=errors)
 
