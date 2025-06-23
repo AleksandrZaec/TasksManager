@@ -2,44 +2,46 @@ import { Button } from '@items/button/Button';
 import { TextArea } from '@items/text-area/TextArea';
 import { useState } from 'react';
 import style from '@components/main/Main.module.scss';
-import s from './EditName.module.scss';
+import s from './EditDescription.module.scss';
 import { TaskType } from '@utils/mockData';
 
-type EditNameProps = {
+type EditDescriptionProps = {
   task: TaskType;
 };
-export const EditName = ({ task }: EditNameProps) => {
+export const EditDescription = ({ task }: EditDescriptionProps) => {
   const [editedTask, setEditedTask] = useState(task);
-  const [isEditingName, setIsEditingName] = useState(false);
-  const handleEditName = () => {
-    setIsEditingName(true);
+  const [isEditingDescription, setIsEditingDescription] = useState(false);
+  const handleEditDescription = () => {
+    setIsEditingDescription(true);
   };
   const handleCancel = () => {
-    setIsEditingName(false);
+    setIsEditingDescription(false);
   };
   return (
-    <div className={s.name}>
-      {isEditingName ? (
+    <div className={s.description}>
+      {isEditingDescription ? (
         <div className={s.container}>
           <TextArea
-            value={editedTask.name}
-            onChange={(e) => setEditedTask({ ...editedTask, name: e.target.value })}
+            value={editedTask.description}
+            onChange={(e) => setEditedTask({ ...editedTask, description: e.target.value })}
             autoFocus
             extraName={s.textarea}
           />
           <div className={s.buttonGroup}>
             <Button type={'text'}>Сохранить</Button>
-            <Button type={'text'} onClick={handleCancel}>Отменить</Button>
+            <Button type={'text'} onClick={handleCancel}>
+              Отменить
+            </Button>
           </div>
         </div>
       ) : (
         <>
-          <h1>{task.name}</h1>
+          <h1>{task.description}</h1>
           <img
             src='/icons/reName.png'
             alt='rename'
             className={style.icon}
-            onClick={handleEditName}
+            onClick={handleEditDescription}
           />
         </>
       )}

@@ -1,0 +1,19 @@
+.container {
+  position: relative;
+}
+.header {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.executor {
+  display: flex;
+  gap: 70px;
+  width: 450px;
+}
+.button {
+  position: relative;
+}
+.drop {
+  left: 87%;
+}

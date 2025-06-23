@@ -5,8 +5,9 @@ type DropdownItemProps = {
   title: string;
   selectedTeam?: string;
   onSelect?: (nameTeam: string) => void;
+  isActive?: boolean;
 };
-export const DropdownItem = ({ title, selectedTeam, onSelect }: DropdownItemProps) => {
+export const DropdownItem = ({ title, selectedTeam, onSelect, isActive }: DropdownItemProps) => {
   const handleTitle = () => {
     onSelect?.(title);
   };
@@ -14,7 +15,7 @@ export const DropdownItem = ({ title, selectedTeam, onSelect }: DropdownItemProp
     <p
       onClick={handleTitle}
       key={title}
-      className={clsx(s.title, { [s.selected]: title === selectedTeam })}>
+      className={clsx(s.title, { [s.selected]: title === selectedTeam }, { [s.active]: isActive })}>
       {title}
     </p>
   );

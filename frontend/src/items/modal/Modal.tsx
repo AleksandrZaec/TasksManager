@@ -26,6 +26,7 @@ export const Modal = ({ children, isOpen, onClose }: ModalProps) => {
   }, [isOpen, onClose]);
 
   const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
     if (e.target === e.currentTarget) {
       onClose();
     }
@@ -35,8 +36,10 @@ export const Modal = ({ children, isOpen, onClose }: ModalProps) => {
 
   return ReactDOM.createPortal(
     <div className={s.modal_overlay} onClick={handleOverlayClick}>
-      <div className={s.modal_content}>{children}</div>
+      <div className={s.modal_content} onClick={(e) => e.stopPropagation()}>
+        {children}
+      </div>
     </div>,
-    document.body
+    document.body,
   );
 };

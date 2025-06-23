@@ -155,3 +155,13 @@ export const column = [
 export const columnUser = ['Имя задачи', 'Срок сдачи', 'Ответственный', 'Приоритет'];
 
 export const titles = ['Все', 'Ожидает', 'В процессе', 'Готово'];
+
+export const priority = ['Низкий', 'Средний', 'Высокий'];
+
+export const status = ['Ожидает', 'В процессе', 'Готово'];
+
+export const allUsers = [
+  { id: 1, name: 'Иванов' },
+  { id: 2, name: 'Петров' },
+  { id: 3, name: 'Сидоров' },
+];

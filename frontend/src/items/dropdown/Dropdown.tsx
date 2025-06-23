@@ -17,6 +17,8 @@ type DropdownProps = {
   profile?: boolean;
   selectedTeam?: string;
   setSelectedTeam?: (nameTeam: string) => void;
+  defaultValue?: string;
+  onSelectValue?: (value: string) => void;
 };
 export const Dropdown = ({
   title,
@@ -24,7 +26,11 @@ export const Dropdown = ({
   profile,
   selectedTeam,
   setSelectedTeam,
+  defaultValue,
+  onSelectValue,
 }: DropdownProps) => {
+  const [selectedValue, setSelectedValue] = useState(defaultValue ?? title);
+
   const [openDropdown, setOpenDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
@@ -51,11 +57,13 @@ export const Dropdown = ({
   const handleTitle = (title: string) => {
     setSelectedTeam?.(title);
     setOpenDropdown(false);
+    setSelectedValue(title);
+    onSelectValue?.(title);
   };
   return (
     <div className={s.dropdown} ref={dropdownRef}>
       <Button type={'dropdown'} onClick={handleOpenDropdown} chevron={openDropdown ? 'up' : 'down'}>
-        {title}
+        {selectedValue}
       </Button>
       {openDropdown && (
         <Block extraClass={clsx(s.block, { [s.profile]: profile })}>
