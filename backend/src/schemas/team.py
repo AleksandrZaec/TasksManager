@@ -1,6 +1,6 @@
 import re
 from typing import Optional, List
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, ConfigDict
 from backend.src.schemas.task import TaskRead
 from backend.src.schemas.team_user import TeamUserAssociationRead, TeamUserAdd
 from datetime import datetime
@@ -23,8 +23,7 @@ class TeamBase(BaseModel):
             )
         return v
 
-    class Config:
-        str_strip_whitespace = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class TeamCreate(TeamBase):
@@ -55,8 +54,7 @@ class TeamRead(BaseModel):
     name: str
     description: Optional[str]
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class TeamWithUsersAndTask(TeamRead):

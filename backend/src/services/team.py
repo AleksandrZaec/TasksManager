@@ -55,7 +55,8 @@ class TeamCRUD(BaseCRUD):
             user.user_id: user.role if user.role else TeamRole.EXECUTOR.value
             for user in users}
 
-        user_roles[creator_id] = TeamRole.MANAGER.value
+        if creator_id is not None:
+            user_roles[creator_id] = TeamRole.MANAGER.value
 
         max_attempts = 5
         for attempt in range(max_attempts):

@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import Optional, List
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, ConfigDict
 from backend.src.models.enum import TeamRole
 
 
@@ -22,8 +22,7 @@ class AddedUserInfo(BaseModel):
     first_name: Optional[str] = None
     last_name: Optional[str] = None
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class TeamUserUpdateRole(BaseModel):
@@ -41,5 +40,4 @@ class TeamUserAssociationRead(BaseModel):
     joined_at: datetime
     updated_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
