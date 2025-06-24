@@ -1,11 +1,12 @@
 from sqladmin import ModelView
 from fastapi import Request, HTTPException
+
+from backend.src.config.db import sessionmaker
 from backend.src.models import User, Team, Task, TeamUserAssociation, TaskAssigneeAssociation, TaskStatusHistory
 from backend.src.schemas import UserCreate, UserUpdate, TeamCreate, TeamUpdate, TaskCreate, TaskUpdate
 from backend.src.services.task import tasks_crud
 from backend.src.services.team import teams_crud
 from backend.src.services.user import users_crud
-from backend.src.config.db import SessionLocal
 
 
 class BaseAdmin(ModelView):
@@ -28,14 +29,14 @@ class UserAdmin(BaseAdmin, model=User):
 
     async def create_model(self, request: Request, data: dict) -> User:
         """Create user with password hashing and validation using users_crud."""
-        async with SessionLocal() as db:
+        async with sessionmaker() as db:
             schema = UserCreate(**data)
             user_read = await users_crud.create(db, schema)
             return await db.get(User, user_read.id)
 
     async def update_model(self, request: Request, pk: int, data: dict) -> User:
         """Update user using custom logic (with password hashing and validation)."""
-        async with SessionLocal() as db:
+        async with sessionmaker() as db:
             schema = UserUpdate(**data)
             result = await users_crud.update(db, pk, schema)
             return await db.get(User, result.id)
@@ -52,7 +53,7 @@ class TeamAdmin(BaseAdmin, model=Team):
         if not creator_id:
             raise HTTPException(status_code=401, detail="Unauthorized: no user_id in session")
 
-        async with SessionLocal() as db:
+        async with sessionmaker() as db:
             team_in = TeamCreate(**data)
             team_read = await teams_crud.create_team(db, team_in, creator_id)
             team = await db.get(Team, team_read.id)
@@ -60,7 +61,7 @@ class TeamAdmin(BaseAdmin, model=Team):
 
     async def update_model(self, request: Request, pk: int, data: dict) -> Team:
         """Update team by ID with validation and invite code regeneration if needed."""
-        async with SessionLocal() as db:
+        async with sessionmaker() as db:
             team_in = TeamUpdate(**data)
             team_read = await teams_crud.update_team(db, pk, team_in)
             team = await db.get(Team, team_read.id)
@@ -81,7 +82,7 @@ class TaskAdmin(BaseAdmin, model=Task):
         if not creator_id or not team_id:
             raise ValueError("creator_id and team_id must be available")
 
-        async with SessionLocal() as db:
+        async with sessionmaker() as db:
             task_in = TaskCreate(**data)
             task_read = await tasks_crud.create_task(db, task_in, creator_id, team_id)
             task = await db.get(Task, task_read.id)
@@ -93,7 +94,7 @@ class TaskAdmin(BaseAdmin, model=Task):
         if not creator_id:
             raise ValueError("creator_id must be available")
 
-        async with SessionLocal() as db:
+        async with sessionmaker() as db:
             task_in = TaskUpdate(**data)
             task_read = await tasks_crud.update_task(db, pk, task_in, creator_id)
             task = await db.get(Task, task_read.id)

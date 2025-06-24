@@ -1,4 +1,4 @@
-from pydantic import BaseModel, model_validator
+from pydantic import BaseModel, model_validator, ConfigDict, Field
 from datetime import datetime
 from typing import List, Optional
 from backend.src.models.enum import MeetingStatus
@@ -33,8 +33,7 @@ class MeetingShortRead(BaseModel):
     status: MeetingStatus
     location: Optional[str] = None
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class MeetingRead(MeetingShortRead):
@@ -44,17 +43,16 @@ class MeetingRead(MeetingShortRead):
     cancelled_by: Optional[AddedUserInfo] = None
     participants: List[AddedUserInfo]
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class MeetingUpdate(BaseModel):
-    """Scheme for updating the meeting"""
-    title: Optional[str]
-    description: Optional[str]
-    status: MeetingStatus
-    location: Optional[str]
-    start_datetime: Optional[datetime]
-    end_datetime: Optional[datetime]
-    add_participant_ids: Optional[List[int]] = []
-    remove_participant_ids: Optional[List[int]] = []
+    """Schema for updating a meeting"""
+    title: Optional[str] = None
+    description: Optional[str] = None
+    status: Optional[MeetingStatus] = None
+    location: Optional[str] = None
+    start_datetime: Optional[datetime] = None
+    end_datetime: Optional[datetime] = None
+    add_participant_ids: List[int] = Field(default_factory=list)
+    remove_participant_ids: List[int] = Field(default_factory=list)

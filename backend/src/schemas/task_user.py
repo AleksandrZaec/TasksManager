@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from datetime import datetime
 from typing import Optional, List
 from backend.src.schemas.team_user import AddedUserInfo
@@ -13,8 +13,7 @@ class AssigneeInfo(BaseModel):
     role: Optional[str] = None
     assigned_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class TaskUserAdd(BaseModel):
@@ -38,7 +37,6 @@ class RoleUpdateResponse(BaseModel):
     msg: str
 
 
-
 class AddUsersResponse(BaseModel):
     """Response schema for adding users to a task or team, including successes and errors."""
     added: List[AddedUserInfo]
@@ -55,5 +53,4 @@ class UsersRemoveResponse(BaseModel):
     removed: List[int]
     not_found: List[int]
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

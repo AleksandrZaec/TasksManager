@@ -148,7 +148,7 @@ class EvaluationCRUD(BaseCRUD):
         rows = result.all()
 
         evaluations = [
-            EvaluationRead.model_validate(evaluation).copy(
+            EvaluationRead.model_validate(evaluation).model_copy(
                 update={"evaluator_full_name": f"{first_name} {last_name}".strip()}
             )
             for evaluation, first_name, last_name in rows

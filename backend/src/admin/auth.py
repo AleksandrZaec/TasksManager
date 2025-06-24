@@ -1,9 +1,11 @@
 from sqladmin.authentication import AuthenticationBackend
 from fastapi import Request
 from sqlalchemy import select
+from backend.src.config.db import sessionmaker
 from backend.src.models import User
-from backend.src.config.db import SessionLocal
 from backend.src.utils.security import verify_password
+
+
 
 
 class AdminAuth(AuthenticationBackend):
@@ -17,7 +19,7 @@ class AdminAuth(AuthenticationBackend):
         if not email or not password:
             return False
 
-        async with SessionLocal() as session:
+        async with sessionmaker() as session:
             user = await session.scalar(select(User).where(User.email == email))
             if not user or not verify_password(password, user.password):
                 return False

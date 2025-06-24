@@ -9,9 +9,9 @@ from backend.src.services.basecrud import BaseCRUD
 from sqlalchemy.orm import selectinload
 
 
-
 class TaskCRUD(BaseCRUD):
     """CRUD for Task"""
+
     def __init__(self):
         super().__init__(model=Task, read_schema=TaskRead)
 
@@ -56,6 +56,9 @@ class TaskCRUD(BaseCRUD):
             await db.refresh(task)
 
             return TaskShortRead.model_validate(task)
+
+        except HTTPException:
+            raise
 
         except Exception as e:
             await db.rollback()
@@ -175,7 +178,7 @@ class TaskCRUD(BaseCRUD):
             select(Task)
             .options(
                 selectinload(Task.assignee_associations)
-                .selectinload(TaskAssigneeAssociation.user) )
+                .selectinload(TaskAssigneeAssociation.user))
             .distinct()
             .where(
                 or_(

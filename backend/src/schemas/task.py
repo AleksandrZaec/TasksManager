@@ -1,6 +1,6 @@
 from typing import Optional, List
 from datetime import datetime
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, field_validator, ConfigDict, Field
 from backend.src.models.enum import TaskStatus, TaskPriority
 from backend.src.schemas.task_user import AssigneeInfo, TaskUserAdd
 
@@ -13,9 +13,7 @@ class TaskBase(BaseModel):
     priority: TaskPriority = TaskPriority.MEDIUM
     due_date: Optional[datetime] = None
 
-
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class TaskCreate(TaskBase):
@@ -50,8 +48,7 @@ class TaskShortRead(BaseModel):
     due_date: Optional[datetime] = None
     id: int
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class TaskRead(TaskBase):
@@ -61,10 +58,9 @@ class TaskRead(TaskBase):
     creator_email: str
     created_at: datetime
     updated_at: Optional[datetime] = None
-    assignees: List[AssigneeInfo] = []
+    assignees: List[AssigneeInfo] = Field(default_factory=list)
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class TaskStatusUpdate(BaseModel):

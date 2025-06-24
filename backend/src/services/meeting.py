@@ -83,11 +83,16 @@ class MeetingCRUD(BaseCRUD):
         checking for the existence of users and time conflicts,
         and handling cancellation metadata.
         """
-        meeting = await db.get(Meeting, meeting_id)
+        result = await db.execute(
+            select(Meeting)
+            .options(selectinload(Meeting.participants))
+            .where(Meeting.id == meeting_id)
+        )
+        meeting = result.scalar_one_or_none()
         if not meeting:
             raise HTTPException(status_code=404, detail="Meeting not found")
 
-        update_data = meet_in.dict(exclude={"add_participant_ids", "remove_participant_ids"}, exclude_none=True)
+        update_data = meet_in.model_dump(exclude={"add_participant_ids", "remove_participant_ids"}, exclude_none=True)
 
         new_status = update_data.get("status")
         if new_status == MeetingStatus.CANCELLED and meeting.status != MeetingStatus.CANCELLED:

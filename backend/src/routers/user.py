@@ -19,10 +19,39 @@ router = APIRouter()
 )
 async def read_users(
         db: AsyncSession = Depends(get_db),
-        # current_user: UserPayload = Depends(is_admin)
+        current_user: UserPayload = Depends(is_admin)
 ) -> List[UserRead]:
     """Get a list of all users."""
     return await users_crud.get_all(db)
+
+
+@router.get(
+    "/me",
+    response_model=UserReadWithTeams,
+    summary="Get own profile",
+    description="Retrieve the profile and team membership information of the currently authenticated user."
+)
+async def read_own_user_detail(
+        db: AsyncSession = Depends(get_db),
+        current_user: UserPayload = Depends(get_current_user),
+) -> UserReadWithTeams:
+    """Get current user's profile."""
+    return await users_crud.get_with_teams(db, current_user.id)
+
+
+@router.put(
+    "/me",
+    response_model=UserRead,
+    summary="Update own profile",
+    description="Update the profile of the currently authenticated user."
+)
+async def update_user(
+        user_in: UserUpdate,
+        db: AsyncSession = Depends(get_db),
+        current_user: UserPayload = Depends(get_current_user),
+) -> UserRead:
+    """Update current user's profile."""
+    return await users_crud.update(db, current_user.id, user_in)
 
 
 @router.get(
@@ -40,20 +69,6 @@ async def read_user_detail(
     return await users_crud.get_with_teams(db, user_id)
 
 
-@router.get(
-    "/me",
-    response_model=UserReadWithTeams,
-    summary="Get own profile",
-    description="Retrieve the profile and team membership information of the currently authenticated user."
-)
-async def read_own_user_detail(
-        db: AsyncSession = Depends(get_db),
-        current_user: UserPayload = Depends(get_current_user),
-) -> UserReadWithTeams:
-    """Get current user's profile."""
-    return await users_crud.get_with_teams(db, current_user.id)
-
-
 @router.post(
     "/",
     response_model=UserRead,
@@ -67,21 +82,6 @@ async def create_user(
 ) -> UserRead:
     """Create a new user."""
     return await users_crud.create(db, user_in)
-
-
-@router.put(
-    "/me",
-    response_model=UserRead,
-    summary="Update own profile",
-    description="Update the profile of the currently authenticated user."
-)
-async def update_user(
-        user_in: UserUpdate,
-        db: AsyncSession = Depends(get_db),
-        current_user: UserPayload = Depends(get_current_user),
-) -> UserRead:
-    """Update current user's profile."""
-    return await users_crud.update(db, current_user.id, user_in)
 
 
 @router.delete(

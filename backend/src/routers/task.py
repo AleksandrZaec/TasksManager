@@ -13,7 +13,7 @@ router = APIRouter()
 
 
 @router.post(
-    "/teams/{team_id}/tasks/",
+    "/{team_id}/tasks/",
     response_model=TaskShortRead,
     status_code=status.HTTP_201_CREATED,
     summary="Create a new task for a team",
@@ -127,7 +127,7 @@ async def get_my_tasks(
 
 
 @router.get(
-    "/teams/{team_id}/tasks",
+    "/{team_id}/tasks",
     response_model=List[TaskShortRead],
     summary="Get tasks for a team",
     description="Retrieve tasks for the specified team, optionally filtered by statuses and priorities. Only team members can access."

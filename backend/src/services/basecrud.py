@@ -44,7 +44,7 @@ class BaseCRUD:
         if not obj:
             raise HTTPException(status_code=404, detail="Object not found")
 
-        obj_data = obj_in.dict(exclude_unset=True)
+        obj_data = obj_in.model_dump(exclude_unset=True)
         for field, value in obj_data.items():
             setattr(obj, field, value)
 
@@ -70,5 +70,3 @@ class BaseCRUD:
         except Exception as e:
             await db.rollback()
             raise HTTPException(status_code=500, detail=f"Database error: {e}")
-
-

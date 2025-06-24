@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, Field, field_validator
+from pydantic import BaseModel, EmailStr, Field, field_validator, ConfigDict
 from typing import Optional, List
 import re
 from backend.src.models.enum import TeamRole
@@ -28,16 +28,14 @@ class UserRead(UserBase):
     """Schema for reading basic user data from the database."""
     id: int
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class UserReadWithTeams(UserRead):
     """Schema for reading user data with all team roles and team names."""
     teams: List[UserTeamRead] = []
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class UserCreate(BaseModel):
@@ -82,4 +80,4 @@ class UserPayload(BaseModel):
     """The payload model for the JWT token."""
     id: int
     role: str
-    teams: List[UserTeamInfo] = []
+    teams: List[UserTeamInfo] = Field(default_factory=list)
