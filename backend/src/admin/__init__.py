@@ -1,7 +1,8 @@
 from fastapi import FastAPI
 from sqladmin import Admin
-from backend.src.config.settings import settings
+
 from backend.src.config.db import engine
+from backend.src.config.settings import settings
 from backend.src.admin.auth import AdminAuth
 from backend.src.admin.views import (
     UserAdmin, TeamAdmin, TaskAdmin,

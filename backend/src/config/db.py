@@ -16,3 +16,7 @@ def get_async_sessionmaker():
 async def get_db() -> AsyncSession:
     async with get_async_sessionmaker()() as session:
         yield session
+
+
+sessionmaker = get_async_sessionmaker()
+engine = get_async_engine()

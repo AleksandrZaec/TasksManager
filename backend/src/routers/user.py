@@ -26,21 +26,6 @@ async def read_users(
 
 
 @router.get(
-    "/{user_id}",
-    response_model=UserReadWithTeams,
-    summary="Get user by ID (admin only)",
-    description="Retrieve detailed information about a user by their ID. Requires ADMIN role."
-)
-async def read_user_detail(
-        user_id: int = Path(..., description="ID of the user to retrieve"),
-        db: AsyncSession = Depends(get_db),
-        current_user: UserPayload = Depends(is_admin)
-) -> UserRead:
-    """Get a user by ID."""
-    return await users_crud.get_with_teams(db, user_id)
-
-
-@router.get(
     "/me",
     response_model=UserReadWithTeams,
     summary="Get own profile",
@@ -52,21 +37,6 @@ async def read_own_user_detail(
 ) -> UserReadWithTeams:
     """Get current user's profile."""
     return await users_crud.get_with_teams(db, current_user.id)
-
-
-@router.post(
-    "/",
-    response_model=UserRead,
-    status_code=status.HTTP_201_CREATED,
-    summary="Create a new user",
-    description="Create a new user in the system with the provided details."
-)
-async def create_user(
-        user_in: UserCreate,
-        db: AsyncSession = Depends(get_db)
-) -> UserRead:
-    """Create a new user."""
-    return await users_crud.create(db, user_in)
 
 
 @router.put(
@@ -82,6 +52,36 @@ async def update_user(
 ) -> UserRead:
     """Update current user's profile."""
     return await users_crud.update(db, current_user.id, user_in)
+
+
+@router.get(
+    "/{user_id}",
+    response_model=UserReadWithTeams,
+    summary="Get user by ID (admin only)",
+    description="Retrieve detailed information about a user by their ID. Requires ADMIN role."
+)
+async def read_user_detail(
+        user_id: int = Path(..., description="ID of the user to retrieve"),
+        db: AsyncSession = Depends(get_db),
+        current_user: UserPayload = Depends(is_admin)
+) -> UserRead:
+    """Get a user by ID."""
+    return await users_crud.get_with_teams(db, user_id)
+
+
+@router.post(
+    "/",
+    response_model=UserRead,
+    status_code=status.HTTP_201_CREATED,
+    summary="Create a new user",
+    description="Create a new user in the system with the provided details."
+)
+async def create_user(
+        user_in: UserCreate,
+        db: AsyncSession = Depends(get_db)
+) -> UserRead:
+    """Create a new user."""
+    return await users_crud.create(db, user_in)
 
 
 @router.delete(

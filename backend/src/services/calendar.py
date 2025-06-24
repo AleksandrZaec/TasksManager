@@ -45,7 +45,7 @@ async def get_user_calendar(
             calendar[task.due_date.date()].append(CalendarTask(
                 id=task.id,
                 title=task.title,
-                due_date=task.due_date))
+                due_date=task.due_date.date()))
 
     for meeting in meetings:
         calendar[meeting.start_datetime.date()].append(CalendarMeeting(
@@ -55,7 +55,8 @@ async def get_user_calendar(
             end_datetime=meeting.end_datetime))
 
     for events in calendar.values():
-        events.sort(key=lambda e: e.due_date if isinstance(e, CalendarTask) else e.start_datetime)
+        events.sort(
+            key=lambda e: e.due_date if isinstance(e, CalendarTask) else e.start_datetime.date())
 
     return dict(calendar)
 
@@ -96,7 +97,7 @@ async def get_team_calendar(
             calendar[task.due_date.date()].append(CalendarTask(
                 id=task.id,
                 title=task.title,
-                due_date=task.due_date))
+                due_date=task.due_date.date()))
 
     for meeting in meetings:
         calendar[meeting.start_datetime.date()].append(CalendarMeeting(
@@ -106,7 +107,7 @@ async def get_team_calendar(
             end_datetime=meeting.end_datetime))
 
     for events in calendar.values():
-        events.sort(key=lambda e: e.due_date if isinstance(e, CalendarTask) else e.start_datetime)
+        events.sort(key=lambda e: e.due_date if isinstance(e, CalendarTask) else e.start_datetime.date())
 
     return dict(calendar)
 

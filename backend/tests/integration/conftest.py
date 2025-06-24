@@ -1,10 +1,12 @@
 import pytest
+import pytest_asyncio
 from typing import List, Optional, Callable, Awaitable, Tuple
 from datetime import datetime, timezone
 from sqlalchemy.ext.asyncio import AsyncSession
 from backend.src.models import (
     TaskAssigneeAssociation, TeamRole, TaskStatus, TaskPriority, Task, Evaluation
 )
+from backend.src.services.basecrud import BaseCRUD
 from backend.src.services.meeting import MeetingCRUD
 from backend.src.services.task_user import TaskAssigneeCRUD
 from backend.src.services.team_user import TeamUserCRUD
@@ -12,6 +14,13 @@ from backend.src.services.user import UserCRUD
 from backend.src.services.team import TeamCRUD
 from backend.src.services.evaluation import EvaluationCRUD
 from backend.src.schemas import UserCreate, TeamCreate, TeamUserAdd
+from backend.tests.integration.factories import TModel, TReadSchema
+
+
+@pytest.fixture
+def crud():
+    """Fixture providing BaseCRUD instance for TestModel."""
+    return BaseCRUD(TModel, TReadSchema)
 
 
 @pytest.fixture(scope="session")
@@ -50,7 +59,7 @@ def evaluation_crud() -> EvaluationCRUD:
     return EvaluationCRUD()
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def create_user(
         test_session: AsyncSession,
         users_crud: UserCRUD
@@ -75,7 +84,7 @@ async def create_user(
     return _create_user
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def create_team(
         test_session: AsyncSession,
         teams_crud: TeamCRUD,
@@ -100,7 +109,7 @@ async def create_team(
     return _create_team
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def create_task(
         test_session: AsyncSession,
         create_user: Callable[..., Awaitable],
@@ -148,7 +157,7 @@ async def create_task(
     return _create_task
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def create_team_with_users(
         test_session: AsyncSession,
         create_user: Callable[..., Awaitable],
@@ -178,7 +187,7 @@ async def create_team_with_users(
     return _create_team
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def create_task_assignees(
         test_session: AsyncSession,
         create_user: Callable[..., Awaitable]
@@ -203,7 +212,7 @@ async def create_task_assignees(
     return _create_task_assignees
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def create_evaluation(
         test_session: AsyncSession,
         create_task_assignees: Callable[..., Awaitable]
