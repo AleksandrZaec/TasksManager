@@ -1,15 +1,9 @@
 from fastapi import FastAPI
 from sqladmin import Admin
-
 from src.admin.auth import AdminAuth
 from src.config.db import engine
-from src.config.settings import settings
-from src.admin.views import (
-    UserAdmin, TeamAdmin, TaskAdmin,
-    TeamUserAssociationAdmin, TaskAssigneeAssociationAdmin,
+from src.admin.views import UserAdmin, TeamAdmin, TaskAdmin, TeamUserAssociationAdmin, TaskAssigneeAssociationAdmin, \
     TaskStatusHistoryAdmin
-
-)
 
 
 def setup_admin(app: FastAPI) -> Admin:
@@ -17,10 +11,10 @@ def setup_admin(app: FastAPI) -> Admin:
     admin = Admin(
         app=app,
         engine=engine,
-        authentication_backend=AdminAuth(secret_key=settings.SECRET_KEY),
         base_url="/admin"
     )
 
+    admin.authentication_backend = AdminAuth(admin)
     register_admin_views(admin)
     return admin
 

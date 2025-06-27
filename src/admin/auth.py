@@ -15,8 +15,8 @@ logger = logging.getLogger(__name__)
 class AdminAuth(AuthenticationBackend):
     """Custom SQLAdmin authentication backend using superuser session check."""
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, admin):
+        super().__init__(admin)
 
     async def login(self, request: Request) -> bool:
         """Authenticate user by checking email and password. Only superusers are allowed to log in."""

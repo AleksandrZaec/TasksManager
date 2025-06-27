@@ -1,10 +1,14 @@
 from fastapi import FastAPI
+from src.config.settings import settings
 from src.routers import user, team, task, auth, comment, evaluation, team_user, task_user, calendar
 from src.routers import meeting
 from src.admin import setup_admin
+from starlette.middleware.sessions import SessionMiddleware
 import logging
 
 app = FastAPI(title="Team Manager")
+
+app.add_middleware(SessionMiddleware, secret_key=settings.SECRET_KEY)
 
 admin = setup_admin(app)
 
@@ -24,4 +28,3 @@ logging.basicConfig(
     format='[%(asctime)s] %(levelname)s in %(module)s: %(message)s',
     datefmt='%Y-%m-%d %H:%M:%S',
 )
-
