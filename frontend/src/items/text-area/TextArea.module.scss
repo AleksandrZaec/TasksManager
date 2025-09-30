@@ -8,14 +8,18 @@
 }
 
 .textarea {
-  all: unset; 
+  all: unset;
   resize: none;
   padding: 8px 12px;
-  font-size: 14px;
+  font-size: 16px;
   border: 1px solid #ccc;
   border-radius: 6px;
   font-family: inherit;
   background-color: #fff;
+  overflow-y: auto;        
+  overflow-x: hidden;       
+  white-space: pre-wrap;    
+  word-wrap: break-word;
   &:focus {
     border-color: #a0a0a0;
   }

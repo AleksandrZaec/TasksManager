@@ -1,4 +1,4 @@
-import { allStatus, column, TaskType } from '@utils/mockData';
+import { allStatus, allUsers, column, TaskType } from '@utils/mockData';
 import { Block } from '@items/block/Block';
 import { Button } from '@items/button/Button';
 import { Scroll } from '@items/scroll/Scroll';
@@ -71,7 +71,12 @@ export const TaskList = ({ data }: TaskTableProps) => {
         </Block>
       ))}
       {selectedTask && (
-        <ModalViewTask task={selectedTask} isOpen={isModalOpen} setOpen={handleCloseModal} />
+        <ModalViewTask
+          currentUser={allUsers[0]}
+          task={selectedTask}
+          isOpen={isModalOpen}
+          setOpen={handleCloseModal}
+        />
       )}
     </div>
   );

@@ -1,9 +1,9 @@
 import { Button } from '@items/button/Button';
 import { TextArea } from '@items/text-area/TextArea';
 import { useState } from 'react';
-import style from '@components/main/Main.module.scss';
 import s from './EditDescription.module.scss';
 import { TaskType } from '@utils/mockData';
+import { IconsItem } from '@items/iconsItem/IconsItem';
 
 type EditDescriptionProps = {
   task: TaskType;
@@ -25,7 +25,7 @@ export const EditDescription = ({ task }: EditDescriptionProps) => {
             value={editedTask.description}
             onChange={(e) => setEditedTask({ ...editedTask, description: e.target.value })}
             autoFocus
-            extraName={s.textarea}
+            extraClass={s.textarea}
           />
           <div className={s.buttonGroup}>
             <Button type={'text'}>Сохранить</Button>
@@ -37,12 +37,7 @@ export const EditDescription = ({ task }: EditDescriptionProps) => {
       ) : (
         <>
           <h1>{task.description}</h1>
-          <img
-            src='/icons/reName.png'
-            alt='rename'
-            className={style.icon}
-            onClick={handleEditDescription}
-          />
+          <IconsItem src='/icons/reName.png' alt='reName' onClick={handleEditDescription} />
         </>
       )}
     </div>

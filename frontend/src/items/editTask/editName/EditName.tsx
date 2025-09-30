@@ -1,9 +1,9 @@
 import { Button } from '@items/button/Button';
 import { TextArea } from '@items/text-area/TextArea';
 import { useState } from 'react';
-import style from '@components/main/Main.module.scss';
 import s from './EditName.module.scss';
 import { TaskType } from '@utils/mockData';
+import { IconsItem } from '@items/iconsItem/IconsItem';
 
 type EditNameProps = {
   task: TaskType;
@@ -25,22 +25,19 @@ export const EditName = ({ task }: EditNameProps) => {
             value={editedTask.name}
             onChange={(e) => setEditedTask({ ...editedTask, name: e.target.value })}
             autoFocus
-            extraName={s.textarea}
+            extraClass={s.textarea}
           />
           <div className={s.buttonGroup}>
             <Button type={'text'}>Сохранить</Button>
-            <Button type={'text'} onClick={handleCancel}>Отменить</Button>
+            <Button type={'text'} onClick={handleCancel}>
+              Отменить
+            </Button>
           </div>
         </div>
       ) : (
         <>
           <h1>{task.name}</h1>
-          <img
-            src='/icons/reName.png'
-            alt='rename'
-            className={style.icon}
-            onClick={handleEditName}
-          />
+          <IconsItem src='/icons/reName.png' alt='reName' onClick={handleEditName} />
         </>
       )}
     </div>

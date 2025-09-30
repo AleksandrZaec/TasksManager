@@ -3,14 +3,14 @@ import clsx from 'clsx';
 import s from './TextArea.module.scss';
 
 type TextAreaProps = TextareaHTMLAttributes<HTMLTextAreaElement> & {
-  extraName?: string;
+  extraClass?: string;
   errorText?: string;
 };
 
 export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
-  ({ extraName, errorText, ...rest }, ref) => {
+  ({ extraClass, errorText, ...rest }, ref) => {
     return (
-      <div className={clsx(s.container, extraName)}>
+      <div className={clsx(s.container, extraClass)}>
         <textarea ref={ref} className={clsx(s.textarea, { [s.error]: !!errorText })} {...rest} />
         {errorText && <p className={s.errorText}>{errorText}</p>}
       </div>
