@@ -13,7 +13,7 @@ export const Task = ({ task, currentName }: TaskProps) => {
       <p>{task.name}</p>
       {!currentName && <p>{task.id}</p>}
       <p>{task.date}</p>
-      <p>{task.executor}</p>
+      <p>{task.executor.map((ex) => ex.name).join(', ')}</p>
       {!currentName && <p>{task.manager}</p>}
       <p>{task.priority}</p>
     </div>

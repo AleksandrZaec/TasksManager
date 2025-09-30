@@ -1,0 +1,36 @@
+@use '@styles/styles.scss' as *;
+
+.container {
+  display: flex;
+  flex-direction: column;
+  width: 350px;
+  max-height: 90px;
+}
+
+.textarea {
+  all: unset;
+  resize: none;
+  padding: 8px 12px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-family: inherit;
+  background-color: #fff;
+  overflow-y: auto;        
+  overflow-x: hidden;       
+  white-space: pre-wrap;    
+  word-wrap: break-word;
+  &:focus {
+    border-color: #a0a0a0;
+  }
+}
+
+.error {
+  border-color: red;
+}
+
+.errorText {
+  color: red;
+  font-size: 12px;
+  margin-top: 4px;
+}

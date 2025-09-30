@@ -1,0 +1,25 @@
+.container {
+  position: relative;
+  padding-left: 10px;
+}
+.header {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.executor {
+  display: flex;
+  align-items: center;
+  gap: 70px;
+  // width: 435px;
+}
+.button {
+  position: relative;
+}
+.drop {
+  position: absolute;
+}
+.dropdown {
+  position: relative;
+  display: inline-block;
+}

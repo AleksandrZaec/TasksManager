@@ -1,0 +1,17 @@
+@use '@styles/styles.scss' as *;
+
+.description {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 10px;
+}
+.container {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.buttonGroup {
+  display: flex;
+  flex-direction: column;
+}
